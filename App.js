@@ -2,36 +2,64 @@ import React, { useRef,useLayoutEffect, useState, useCallback, useEffect } from 
 import { View, Text, Modal, ScrollView, TextInput, StyleSheet, TouchableWithoutFeedback, TouchableOpacity, Image, Touchable, Animated, Easing, TouchableNativeFeedback } from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const App = () => {
 
     // 달력
     const Calendar = () => {
+
+        // 상태관리 : 현재 년도와 월을 의미함.
+        const [selectedDate, setSelectedDate] = useState(new Date());
+
+
+        const [days, setDays] = useState([]);
+
+        // 날짜 변경함수 (이전달, 다음달)
+        // direction 이라는 매개변수는 이전달로 갈지, 다음달로 갈지 결정하는 값
+        const changeMonth = (direction) => {
+            // newDate라는 새로운 날짜객체를 만들고, selectedDate라는 현재날짜값을 복붙함.
+            // 굳이 복붙하는 이유는 selectedDate 상태를 직접 수정하게되면 버그가 생길 수도 있기 때문!
+            const newDate = new Date(selectedDate);
+            // newDate.getMonth() : 현재 newDate의 월을 가져옴.
+            // newDate.getMonth()로 가져온 현재월에 + direction매개변수(-1또는 1)를 더함으로써 달력을 이동함.
+            newDate.setMonth(newDate.getMonth() + direction);
+            setSelectedDate(newDate);
+        };
+        // const date = new Date();
+        useEffect(() => {
+            const year = selectedDate.getFullYear();
+            const month = selectedDate.getMonth();
+            
+
+            const firstDay = new Date(year, month, 1); // 해당 월의 1일
+            const lastDay = new Date(year, month + 1, 0); // 해당 월의 마지막날
+    
+            const firstDate = firstDay.getDate(); // 1일
+            const lastDate = lastDay.getDate(); // 마지막날
+            const newDays = [];
+            for (let i = firstDate; i <= lastDate; i++) {
+                newDays.push(i); // 1일부터 마지막날까지추가
+            }
+            setDays(newDays);
+        },[selectedDate]);
+        
         const date = new Date();
-        const year = date.getFullYear();
         const month = date.getMonth();
         const nowDate = date.getDate();
-
-        const today = month+1;
-        const firstDay = new Date(year, month, 1); // 해당 월의 1일
-        const lastDay = new Date(year, month + 1, 0); // 해당 월의 마지막날
-
-        const firstDate = firstDay.getDate(); // 1일
-        const lastDate = lastDay.getDate(); // 마지막날
-        const days = [];
-        for (let i = firstDate; i <= lastDate; i++) {
-            days.push(i); // 1일부터 마지막날까지추가
-        }
-
+        const today = selectedDate.getMonth()+1;
+        const year = date.getFullYear();
       
         return (
             <View style={styles.calendarContainer}>
                 <View style={styles.calendarTodayContainer}>
+                    <TouchableOpacity onPress={() => changeMonth(-1)}><Text>이전달</Text></TouchableOpacity>
                 <Text style={styles.calendarToday}>{today}월</Text>
+                <TouchableOpacity onPress={() => changeMonth(1)}><Text>다음달</Text></TouchableOpacity>
                 </View>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{justifyContent: 'center', alignItems: 'center'}}>
                     <View style={styles.calendarDateContainer}>
                         {days.map((day) => (
-                            <View key={day} style={[styles.calendarDate, nowDate === day ? {backgoundColor: '#D7D6FB'} :{backgroundColor:'#EFF5FD'} ]}>
+                            <View key={day} style={[styles.calendarDate, nowDate === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? {backgoundColor: '#D7D6FB'} :{backgroundColor:'#EFF5FD'} ]}>
                                 <Text style={styles.calendarDateText}>{day}</Text>
                             </View>
                         ))}

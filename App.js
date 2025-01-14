@@ -17,37 +17,36 @@ const App = () => {
     const nowYear = selectedDate.getFullYear();
     const nowDate = selectedDate.getDate();
 
-    const dateCheck = selectedDate.getFullYear() === year && selectedDate.getMonth() === month && selectedDate.getDate() === dateDay;
+    // const dateCheck = selectedDate.getFullYear() === year && selectedDate.getMonth() === month && selectedDate.getDate() === dateDay;
+    const isToday = selectedDate.getFullYear() === year && selectedDate.getMonth() === month && selectedDate.getDate() === dateDay;
     const dateText = nowMonth + "월 " + nowDate + "일";
 
     // ------------------------ 달력 아이콘 ------------------------ //
-    const CalendarIcon = () => {
-        const calendarView = () => {
-            setCalendarViewClick(!calendarViewClick);
-        }
-        return (
-            <View style={styles.calendarIconContainer}>
-                <TouchableOpacity onPress={calendarView} style={styles.calendarView}><Icon name="today" size={30} color="#9C9CA8"></Icon></TouchableOpacity>
-            </View>
-        )
-    }
+    // const CalendarIcon = () => {
+    //     const calendarView = () => {
+    //         setCalendarViewClick(!calendarViewClick);
+    //     }
+    //     return (
+    //         <View style={styles.calendarIconContainer}>
+    //             <TouchableOpacity onPress={calendarView} style={styles.calendarView}><Icon name="today" size={30} color="#9C9CA8"></Icon></TouchableOpacity>
+    //         </View>
+    //     )
+    // }
 
 
     // const [days,setDays] = useState([]); 대신 useMemo를 사용하여 날짜배열 관리
     const days = useMemo(() => {
-
-        
         const firstDay = new Date(nowYear, nowMonth, 1); // 해당 월의 1일 객체를 반환
         const lastDay = new Date(nowYear, nowMonth + 1, 0); // 해당 월의 마지막날 객체를 반환
         const firstDate = firstDay.getDate(); // 1 이라는 날짜값만 반환
         const lastDate = lastDay.getDate(); // 마지막 날짜값만 반환
 
-        const newDays = []; // 날짜를 저장할 빈 배열생성
+        const days = []; // 날짜를 저장할 빈 배열생성
         for (let i = firstDate; i <= lastDate; i++) {
-            newDays.push(i); // 1일부터 마지막날까지 배열에 추가
+            days.push(i); // 1일부터 마지막날까지 배열에 추가
         }
         // setDays(newDays); // days 배열안에 1일부터 마지막날까지 날짜가 저장된 newDays를 저장
-        return newDays;
+        return days;
     }, [selectedDate]);
 
     // ------------------------ 달력 ------------------------ //
@@ -56,18 +55,18 @@ const App = () => {
         // const [days, setDays] = useState([]);
 
         // 월 변경 함수 ( < > 누르면 direction값에 따라 월 변경 )
-        const changeMonth = (direction) => {
+        const changeMonth = useCallback((direction) => {
             const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
             newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
             setSelectedDate(newDate); // 변경된 월을 selectedDate에 저장
-        };
+        });
 
         // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
-        const handleDateClick = (day) => {
+        const handleDateClick = useCallback((day) => {
             const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성
             newDate.setDate(day); // 클릭한 날짜를 newDate객체에 저장
             setSelectedDate(newDate); // 저장된 날짜를 selectedDate에 저장
-        }
+        });
 
         // ( selectedDate의 값이 바뀔때마다 실행되는 ) 달력 체인지
         // useEffect(() => {
@@ -88,7 +87,7 @@ const App = () => {
     
 
         return (
-            calendarViewClick && (
+      
                 <View style={styles.calendarContainer}>
                     <View style={styles.calendarTodayContainer}>
                         <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calendarTodayLeftRight}><Icon name="chevron-left" size={20} color="#FFFFFF"></Icon></TouchableOpacity>
@@ -112,7 +111,7 @@ const App = () => {
                                 }
                                 return (
                                     <TouchableOpacity key={day} onPress={() => handleDateClick(day)}>
-                                        <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#D7D6FB'} : { backgroundColor: '#FFFFFF' }]}>
+                                        <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5'} : { backgroundColor: '#FFFFFF' }]}>
                                             <Text style={[styles.calendarDayText, , dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? {color: '#FFFFFF'} : {color: '#D1D1D1'}]}>{dayText}</Text>
                                             <Text style={styles.calendarDateText}>{day}</Text>
                                         </View>
@@ -125,7 +124,7 @@ const App = () => {
                     </ScrollView>
                 </View>
             )
-        )
+        
     }
 
     // ------------------------ 현재 날짜 표시 & 할일 갯수 표시 ------------------------ //
@@ -139,7 +138,7 @@ const App = () => {
             <View style={styles.TimeTextContainer}>
                 <View style={styles.TimeText}>
                     <Text style={styles.TimeTextDate}>{dateText}</Text>
-                    <TouchableOpacity style={[styles.nowDay, dateCheck ? { display: 'flex' } : { display: 'none' }]}><Text style={styles.nowDayText}>오늘</Text></TouchableOpacity>
+                    <TouchableOpacity style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={styles.nowDayText}>오늘</Text></TouchableOpacity>
                 </View>
                 <View style={styles.TodoBlockContainer}>
                     <View style={styles.TodoBlock}>
@@ -225,10 +224,10 @@ const App = () => {
 
         // 색상마다 id와 color값 저장
         const colorOptions = [
-            { id: 1, color: '#FFB8B8' },
-            { id: 2, color: '#FFF98B' },
-            { id: 3, color: '#CAF6BD' },
-            { id: 4, color: '#BDD3F6' },
+            { id: 1, color: '#FDF97F' },
+            { id: 2, color: '#C4F6B6' },
+            { id: 3, color: '#FFA8A0' },
+            { id: 4, color: '#DCBBFC' },
         ]
 
         return (
@@ -330,7 +329,7 @@ const App = () => {
 
     return (
         <View style={styles.mainContainer}>
-            <CalendarIcon></CalendarIcon>
+            {/* <CalendarIcon></CalendarIcon> */}
             <Calendar calendarViewClick={calendarViewClick}></Calendar>
             <TimeText></TimeText>
             <ToDoText todoList={todoList} toggleCheck={toggleCheck} removeTodo={removeTodo}></ToDoText>
@@ -344,7 +343,7 @@ const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#EFF5FD',
+        backgroundColor: 'white',
     },
     calendarIconContainer: {
         // flex: 1,
@@ -368,8 +367,8 @@ const styles = StyleSheet.create({
     },
     calendarContainer: {
         width: '100%',
-        height: 100,
-        backgroundColor: '#EFF5FD',
+        height: 120,
+        backgroundColor: '#EEF1F6',
     },
     calendarDateContainer: {
         flexDirection: 'row',
@@ -381,7 +380,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         // marginBottom: 10,
-        marginTop: 10,
+        marginTop: 15,
         marginLeft: 10,
         borderRadius: 15,
         padding: 5,
@@ -389,7 +388,7 @@ const styles = StyleSheet.create({
     calendarTodayLeftRight: {
         width: 20,
         height: 20,
-        backgroundColor: '#D7D6FB',
+        backgroundColor: '#C4D1F5',
         textAlign: 'center',
         borderRadius: 10,
         marginTop: 2,
@@ -399,8 +398,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     calendarDate: {
-        width: 40,
-        height: 40,
+        width: 42,
+        height: 42,
         backgroundColor: '#D7D6FB',
         borderRadius: 10, // 원 모양 만들기 위해 반지름 설정
         justifyContent: 'center', // 세로 중앙 정렬
@@ -425,7 +424,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        backgroundColor: '#EFF5FD',
+        // backgroundColor: '#EEEEEE',
     },
     TimeText: {
         width: '100%',
@@ -448,8 +447,8 @@ const styles = StyleSheet.create({
     },
     nowDay: {
         width: 40,
-        height: 25,
-        backgroundColor: '#D7D6FB',
+        height: 23,
+        backgroundColor: '#C4D1F5',
         marginLeft: 5,
         // textAlign: 'center',
         justifyContent: 'center',
@@ -462,7 +461,7 @@ const styles = StyleSheet.create({
     },
     nowDayText: {
         textAlign: 'center',
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: '600',
         color : '#FFFFFF',
     },
@@ -476,20 +475,19 @@ const styles = StyleSheet.create({
         // marginRight: 10,
     },
     TodoBlock: {
+
         width: 150,
         height: 80,
         marginLeft: 20,
         marginRight: 2,  // 두 블록 사이 간격
-        backgroundColor: '#FFFFFF',  // 기본 색상
+        backgroundColor: '#EEF1F6',  // 기본 색상
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 20,
-
-        // color: 'red',        
+        borderRadius: 20,     
     },
     TodoBlockText: {
         fontSize: 12,
-        color: '#BBBBBB',
+        // color: '#C4D1F5',
     },
     TodoBlockCount: {
         fontSize: 20,
@@ -501,9 +499,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end', // 오른쪽 끝으로 정렬
         alignItems: 'flex-start', // 위쪽 끝으로 정렬
         width: '100%',
-        // backgroundColor: 'grey',
-        // marginTop: 20, // 위쪽에서 떨어진 만큼 마진을 추가
-        // marginRight: 20, // 오른쪽에서 떨어진 만큼 마진을 추가
     },
     deleteBtn: {
         width: 50,
@@ -519,7 +514,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         // paddingHorizontal: 10,
-        backgroundColor: '#EFF5FD',
+        // backgroundColor: '#EEF1F6',
+        paddingTop: 10,
     },
     ToDoAdd: {
         width: '100%',
@@ -551,11 +547,11 @@ const styles = StyleSheet.create({
     },
     color: {
         width: 4,
-        height: 45,
+        height: 38,
         // backgroundColor: 'red',
         marginLeft: 15,
         marginRight: 0,
-        borderRadius: 10,
+        // borderRadius: 10,
     },
     AddModalContainer: {
         position: 'absolute',
@@ -568,7 +564,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         // backgroundColor: '#D7D6FB',
-        backgroundColor: '#FF7A7A',
+        backgroundColor: '#C4D1F5',
         width: 70,
         height: 70,
         borderRadius: '100%',
@@ -654,7 +650,7 @@ const styles = StyleSheet.create({
     modalSave: {
         width: 50,
         height: 40,
-        backgroundColor: '#FF7A7A',
+        backgroundColor: '#C4D1F5',
         borderRadius: 10,
         justifyContent: 'center', // 세로로 중앙 정렬
         alignItems: 'center',

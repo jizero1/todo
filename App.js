@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, Modal, ScrollView, TextInput, StyleSheet, TouchableWithoutFeedback, TouchableOpacity, Image, TouchableNativeFeedback } from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -17,22 +17,44 @@ const App = () => {
     const nowYear = selectedDate.getFullYear();
     const nowDate = selectedDate.getDate();
 
-    // const dateCheck = selectedDate.getFullYear() === year && selectedDate.getMonth() === month && selectedDate.getDate() === dateDay;
-    const isToday = selectedDate.getFullYear() === year && selectedDate.getMonth() === month && selectedDate.getDate() === dateDay;
+    // const isToday = selectedDate.getFullYear() === year && selectedDate.getMonth() === month && selectedDate.getDate() === dateDay;
+
+
+    // const isToday = dateDay === nowDate;
+    // const [isToday, setIsToday] = useState(false);
+
+    // useEffect(() => {
+    //     const today = new Date();
+    //     const isToday = selectedDate.getFullYear() === today.getFullYear() &&
+    //         selectedDate.getMonth() === today.getMonth() &&
+    //         selectedDate.getDate() === today.getDate();
+    //     setIsToday(isToday);
+    // }, [selectedDate]);
+
+
+    useEffect(() => {
+        // 날짜를 주기적으로 확인하는 setInterval 설정 (1분마다 체크)
+        const intervalId = setInterval(() => {
+            const currentDate = new Date();
+
+            // 현재 날짜가 selectedDate와 다르면 selectedDate를 현재 날짜로 업데이트
+            if (currentDate.getDate() !== selectedDate.getDate() ||
+                currentDate.getMonth() !== selectedDate.getMonth() ||
+                currentDate.getFullYear() !== selectedDate.getFullYear()) {
+                setSelectedDate(currentDate); // 날짜가 다르면 업데이트
+            }
+        }, 60000); // 1분마다 체크
+
+        // 컴포넌트가 언마운트되면 setInterval을 정리
+        return () => clearInterval(intervalId);
+    }, [selectedDate]); // selectedDate가 변경될 때마다 다시 실행
+    // 오늘 날짜인지 확인하는 함수
+    const isToday = (selectedDate.getDate() === new Date().getDate() &&
+        selectedDate.getMonth() === new Date().getMonth() &&
+        selectedDate.getFullYear() === new Date().getFullYear());
+
+
     const dateText = nowMonth + "월 " + nowDate + "일";
-
-    // ------------------------ 달력 아이콘 ------------------------ //
-    // const CalendarIcon = () => {
-    //     const calendarView = () => {
-    //         setCalendarViewClick(!calendarViewClick);
-    //     }
-    //     return (
-    //         <View style={styles.calendarIconContainer}>
-    //             <TouchableOpacity onPress={calendarView} style={styles.calendarView}><Icon name="today" size={30} color="#9C9CA8"></Icon></TouchableOpacity>
-    //         </View>
-    //     )
-    // }
-
 
     // const [days,setDays] = useState([]); 대신 useMemo를 사용하여 날짜배열 관리
     const days = useMemo(() => {
@@ -59,6 +81,8 @@ const App = () => {
             const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
             newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
             setSelectedDate(newDate); // 변경된 월을 selectedDate에 저장
+
+
         });
 
         // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
@@ -68,63 +92,46 @@ const App = () => {
             setSelectedDate(newDate); // 저장된 날짜를 selectedDate에 저장
         });
 
-        // ( selectedDate의 값이 바뀔때마다 실행되는 ) 달력 체인지
-        // useEffect(() => {
-        //     const firstDay = new Date(nowYear, nowMonth, 1); // 해당 월의 1일 객체를 반환
-        //     const lastDay = new Date(nowYear, nowMonth + 1, 0); // 해당 월의 마지막날 객체를 반환
-        //     const firstDate = firstDay.getDate(); // 1 이라는 날짜값만 반환
-        //     const lastDate = lastDay.getDate(); // 마지막 날짜값만 반환
-
-        //     const newDays = []; // 날짜를 저장할 빈 배열생성
-        //     for (let i = firstDate; i <= lastDate; i++) {
-        //         newDays.push(i); // 1일부터 마지막날까지 배열에 추가
-        //     }
-        //     setDays(newDays); // days 배열안에 1일부터 마지막날까지 날짜가 저장된 newDays를 저장
-        // }, [selectedDate]);
-
-        
-       
-    
 
         return (
-      
-                <View style={styles.calendarContainer}>
-                    <View style={styles.calendarTodayContainer}>
-                        <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calendarTodayLeftRight}><Icon name="chevron-left" size={20} color="#FFFFFF"></Icon></TouchableOpacity>
-                        <Text style={styles.calendarToday}>{nowYear}년 {nowMonth}월</Text>
-                        <TouchableOpacity onPress={() => changeMonth(1)} style={styles.calendarTodayLeftRight}><Icon name="chevron-right" size={20} color="#FFFFFF"></Icon></TouchableOpacity>
-                    </View>
-                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
-                        <View style={styles.calendarDateContainer}>
-                            {days.map((day) => {
-                                const days = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day);
-                                const dayOfWeek = days.getDay();
-                                let dayText = "";
-                                switch (dayOfWeek) {
-                                    case 0: dayText = "일"; break;
-                                    case 1: dayText = "월"; break;
-                                    case 2: dayText = "화"; break;
-                                    case 3: dayText = "수"; break;
-                                    case 4: dayText = "목"; break;
-                                    case 5: dayText = "금"; break;
-                                    case 6: dayText = "토"; break;
-                                }
-                                return (
-                                    <TouchableOpacity key={day} onPress={() => handleDateClick(day)}>
-                                        <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5'} : { backgroundColor: '#FFFFFF' }]}>
-                                            <Text style={[styles.calendarDayText, , dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? {color: '#FFFFFF'} : {color: '#D1D1D1'}]}>{dayText}</Text>
-                                            <Text style={styles.calendarDateText}>{day}</Text>
-                                        </View>
-                                    </TouchableOpacity>
 
-                                )
-                            })}
-
-                        </View>
-                    </ScrollView>
+            <View style={styles.calendarContainer}>
+                <View style={styles.calendarTodayContainer}>
+                    <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calendarTodayLeftRight}><Icon name="chevron-left" size={20} color="#FFFFFF"></Icon></TouchableOpacity>
+                    <Text style={styles.calendarToday}>{nowYear}년 {nowMonth}월</Text>
+                    <TouchableOpacity onPress={() => changeMonth(1)} style={styles.calendarTodayLeftRight}><Icon name="chevron-right" size={20} color="#FFFFFF"></Icon></TouchableOpacity>
                 </View>
-            )
-        
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={styles.calendarDateContainer}>
+                        {days.map((day) => {
+                            const days = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day);
+                            const dayOfWeek = days.getDay();
+                            let dayText = "";
+                            switch (dayOfWeek) {
+                                case 0: dayText = "일"; break;
+                                case 1: dayText = "월"; break;
+                                case 2: dayText = "화"; break;
+                                case 3: dayText = "수"; break;
+                                case 4: dayText = "목"; break;
+                                case 5: dayText = "금"; break;
+                                case 6: dayText = "토"; break;
+                            }
+                            return (
+                                <TouchableOpacity key={day} onPress={() => handleDateClick(day)}>
+                                    <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }]}>
+                                        <Text style={[styles.calendarDayText, , dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#D1D1D1' }]}>{dayText}</Text>
+                                        <Text style={styles.calendarDateText}>{day}</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                            )
+                        })}
+
+                    </View>
+                </ScrollView>
+            </View>
+        )
+
     }
 
     // ------------------------ 현재 날짜 표시 & 할일 갯수 표시 ------------------------ //
@@ -285,7 +292,7 @@ const App = () => {
             );
             return updatedList;
         });
-    },[]);
+    }, []);
 
     // 삭제버튼 누를시, todo에 저장된 id 삭제
     const removeTodo = useCallback((id) => {
@@ -293,7 +300,7 @@ const App = () => {
             const updatedList = prevList.filter((todo) => todo.id !== id);
             return updatedList;
         });
-    },[]);
+    }, []);
 
     // 저장소의 데이터 조회 ( selectedDate(선택한 연도,달) 의 값이변경될때마다 실행 )
     // --------------------- 할일 목록 조회 ------------------------ //
@@ -415,7 +422,7 @@ const styles = StyleSheet.create({
     calendarDateText: {
         color: 'black',
     },
-    
+
     TimeTextContainer: {
         marginTop: 10,
         marginBottom: 15,
@@ -463,7 +470,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 12,
         fontWeight: '600',
-        color : '#FFFFFF',
+        color: '#FFFFFF',
     },
     TodoBlockContainer: {
         width: '100%',
@@ -483,7 +490,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#EEF1F6',  // 기본 색상
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 20,     
+        borderRadius: 20,
     },
     TodoBlockText: {
         fontSize: 12,

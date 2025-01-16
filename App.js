@@ -16,37 +16,26 @@ const App = () => {
     const nowYear = selectedDate.getFullYear();
     const nowDate = selectedDate.getDate();
 
-    // // ---------12시 되면 현재날짜에 오늘이 표시되어야함. 
-    // useEffect(() => {
-    //     // 날짜를 주기적으로 확인하는 setInterval 설정 (1분마다 체크)
-    //     const intervalId = setInterval(() => {
-    //         const currentDate = new Date();
-
-    //         // 현재 날짜가 selectedDate와 다르면 selectedDate를 현재 날짜로 업데이트
-    //         if (currentDate.getDate() !== selectedDate.getDate() ||
-    //             currentDate.getMonth() !== selectedDate.getMonth() ||
-    //             currentDate.getFullYear() !== selectedDate.getFullYear()) {
-    //             setSelectedDate(currentDate); // 날짜가 다르면 업데이트
-    //         }
-    //     }, 60000); // 1분마다 체크
-
-    //     // 컴포넌트가 언마운트되면 setInterval을 정리
-    //     return () => clearInterval(intervalId);
-    // }, [selectedDate]); // selectedDate가 변경될 때마다 다시 실행
     // 오늘 날짜인지 확인하는 함수
     const isToday = (selectedDate.getDate() === new Date().getDate() &&
         selectedDate.getMonth() === new Date().getMonth() &&
         selectedDate.getFullYear() === new Date().getFullYear());
     // ----------------------------------------------------
 
-    const dateText = nowMonth + "월 " + nowDate + "일";
+
+
+    // const dateText = `${nowMonth}월 ${nowDate}일`;
+    const firstDay = new Date(nowYear, nowMonth, 1); // 해당 월의 1일 객체를 반환
+    const lastDay = new Date(nowYear, nowMonth + 1, 0); // 해당 월의 마지막날 객체를 반환
+    const firstDate = firstDay.getDate(); // 1 이라는 날짜값만 반환
+    const lastDate = lastDay.getDate(); // 마지막 날짜값만 반환
 
     // const [days,setDays] = useState([]); 대신 useMemo를 사용하여 날짜배열 관리
     const days = useMemo(() => {
-        const firstDay = new Date(nowYear, nowMonth, 1); // 해당 월의 1일 객체를 반환
-        const lastDay = new Date(nowYear, nowMonth + 1, 0); // 해당 월의 마지막날 객체를 반환
-        const firstDate = firstDay.getDate(); // 1 이라는 날짜값만 반환
-        const lastDate = lastDay.getDate(); // 마지막 날짜값만 반환
+        // const firstDay = new Date(nowYear, nowMonth, 1); // 해당 월의 1일 객체를 반환
+        // const lastDay = new Date(nowYear, nowMonth + 1, 0); // 해당 월의 마지막날 객체를 반환
+        // const firstDate = firstDay.getDate(); // 1 이라는 날짜값만 반환
+        // const lastDate = lastDay.getDate(); // 마지막 날짜값만 반환
 
         const days = []; // 날짜를 저장할 빈 배열생성
         for (let i = firstDate; i <= lastDate; i++) {
@@ -54,64 +43,39 @@ const App = () => {
         }
         // setDays(newDays); // days 배열안에 1일부터 마지막날까지 날짜가 저장된 newDays를 저장
         return days;
-    }, [selectedDate]);
+    }, [nowYear, nowMonth]);
+
+// 월 변경 함수 ( < > 누르면 direction값에 따라 월 변경 )
+const changeMonth = useCallback((direction) => {
+    const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
+    newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
+    setSelectedDate(newDate); // 변경된 월을 selectedDate에 저장
+}, [selectedDate]);
+
+// const [click, setClick] = useState(false);
+// const dateClick = () => {
+//     setClick(!click);
+// }
+ // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
+ const handleDateClick = useCallback((day) => {
+    const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성
+    newDate.setDate(day); // 클릭한 날짜를 newDate객체에 저장
+    setSelectedDate(newDate); // 저장된 날짜를 selectedDate에 저장
+},[selectedDate]);
+
+useEffect(() => {
+    getData();  // 컴포넌트 마운트 시 데이터 가져오기
+}, [selectedDate]);  // 연도나 월이 변경될 때마다 다시 데이터 로드
 
 
-    // ------------------------ 달력 ------------------------ //
-    const Calendar = ({ aa }) => {
+const [a, setA] = useState({});
+const getData = async () => {
 
-        // const [days, setDays] = useState([]);
-
-        // 월 변경 함수 ( < > 누르면 direction값에 따라 월 변경 )
-        const changeMonth = useCallback((direction) => {
-            const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
-            newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
-            setSelectedDate(newDate); // 변경된 월을 selectedDate에 저장
-
-
-        });
-
-        // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
-        const handleDateClick = useCallback((day) => {
-            const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성
-            newDate.setDate(day); // 클릭한 날짜를 newDate객체에 저장
-            setSelectedDate(newDate); // 저장된 날짜를 selectedDate에 저장
-
-            // const dayKey = `${nowYear}-${nowMonth + 1}-${day}`;
-
-            // // AsyncStorage에 true/false 값을 저장
-            // AsyncStorage.setItem(dayKey, 'true')
-            //     .then(() => {
-            //         console.log(`Item for ${dayKey} saved as true.`);
-            //         getData();  // 데이터를 다시 로드하여 화면에 반영
-            //     })
-            //     .catch((error) => {
-            //         console.error("Error saving data: ", error);
-            //     });
-        });
-
-// --------------------------- 해당 날짜에 데이터가 있으면, dddd 색상 변경 ----------------
-        useEffect(() => {
-            getData();  // 컴포넌트 마운트 시 데이터 가져오기
-        }, [nowYear, nowMonth]);  // 연도나 월이 변경될 때마다 다시 데이터 로드
-
-        const [a, setA] = useState({});
-        const getData = async () => {
-            const date = new Date();
-            const firstDay = new Date(nowYear, nowMonth, 1);
-            const lastDay = new Date(nowYear, nowMonth + 1, 0);
-            const firstDate = firstDay.getDate();
-            const lastDate = lastDay.getDate();
-            const day = date.getDate();
-            // let i = 0;
-            let updatedA = {};
-            for (let i = firstDate; i <= lastDate; i++) {
-                const allDays = nowYear+"-"+nowMonth+"-"+i;
-                console.log("ff"+allDays); // 2025-1-15
-                const get = await AsyncStorage.getItem(allDays);
-                console.log("get" + get); // get[{"id":1736954255313,"text":"F","checked":true,"color":"#C4F6B6"}]
-
-                
+    let updatedA = {}; // 날짜별로 false, true저장 (데이터의 유무)
+ 
+    for (let i = firstDate; i <= lastDate; i++) {
+        const allDays = nowYear + "-" + nowMonth + "-" + i;
+        const get = await AsyncStorage.getItem(allDays);
         if (get === null || get === "[]") {
             // 데이터가 없으면 false
             updatedA[allDays] = false;
@@ -119,22 +83,43 @@ const App = () => {
             // 데이터가 있으면 true
             updatedA[allDays] = true;
         }
+    }
+    setA(updatedA);
+}
 
-                console.log("gg"+allDays); // 2025-1-15
-            }
-            setA(updatedA);
-            console.log("gggg"+a["2025-1-2"]);
+const [click, setClick] = useState({});
+const dateClick = (day) => {
+    setClick((prevState) => {
+        const newState = {};
+        
+        // 이전에 클릭된 날짜를 모두 false로 설정하고
+        for (const key in prevState) {
+            newState[key] = false;
         }
-// --------------------------------------------------------------
+        
+        // 클릭한 날짜는 true로 설정
+        newState[day] = true;
+
+        return newState;
+    });
+};
+    
+    // ------------------------ 달력 ------------------------ //
+    const Calendar = () => {
 
         return (
-
             <View style={styles.calendarContainer}>
                 <View style={styles.calendarTodayContainer}>
-
-                    <Text style={styles.calendarToday}>{nowYear}년 {nowMonth}월</Text>
-                    <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calendarTodayLeftRight}><Icon name="chevron-left" size={20} color="#FFFFFF"></Icon></TouchableOpacity>
-                    <TouchableOpacity onPress={() => changeMonth(1)} style={styles.calendarTodayLeftRight}><Icon name="chevron-right" size={20} color="#FFFFFF"></Icon></TouchableOpacity>
+                    <View style={styles.calendarToday}>
+                        <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
+                        <View style={styles.calendarTodayDate}>
+                            <Text style={styles.calendarTodayDateText}>{nowDate}일</Text>
+                        </View>
+                    </View>
+                    <View style={styles.calendarTodayLeftRightContainer}>
+                        <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calendarTodayLeft}><Icon name="chevron-left" size={20} color="#FFFFFF" style={styles.calendarTodayLeftIcon}></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(1)} style={styles.calendarTodayRight}><Icon name="chevron-right" size={20} color="#FFFFFF" style={styles.calendarTodayRightIcon}></Icon></TouchableOpacity>
+                    </View>
                 </View>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
                     <View style={styles.calendarDateContainer}>
@@ -155,40 +140,32 @@ const App = () => {
                             const dayKey = `${nowYear}-${nowMonth}-${day}`;  // 날짜 포맷: 'YYYY-MM-DD'
 
                             return (
-
-                                <TouchableOpacity key={day} onPress={() => handleDateClick(day)}>
-                                    <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }]}>
-                                        <Text style={[styles.calendarDayText, , dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#D1D1D1' }]}>{dayText}</Text>
+                                <TouchableOpacity key={day} onPress={() => {handleDateClick(day); dateClick(day);}}>
+                                    {/* click === true ? {backgroundColor: 'red'} : {backgroundColor: 'blue'} */}
+                                    <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#F9F9F9' }, click[day] ? {borderWidth: 3, borderColor: '#B7C6DA'} : {borderWidth: 3, borderColor: '#F9F9F9'}]}>
+                                        <Text style={[styles.calendarDayText, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#898989' }]}>{dayText}</Text>
                                         <Text style={styles.calendarDateText}>{day}</Text>
-                                        <Text style={[styles.gg, a[dayKey] ? { color: 'red' } : { color: 'blue' }]}>dddd</Text>
+                                        <Text style={[styles.calendarDot, a[dayKey] ? { display: 'visible' } : { display: 'none' }]}>.</Text>
                                     </View>
-
-
                                 </TouchableOpacity>
-
                             )
                         })}
-
                     </View>
                 </ScrollView>
-
             </View>
         )
-
     }
 
     // ------------------------ 현재 날짜 표시 & 할일 갯수 표시 ------------------------ //
     const TimeText = () => {
         const date = new Date();
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const nowDate = year + "." + month + "." + day;
+        // const year = date.getFullYear();
+        // const month = date.getMonth() + 1;
+        // const day = date.getDate();
+        // const nowDate = year + "." + month + "." + day;
         return (
             <View style={styles.TimeTextContainer}>
                 <View style={styles.TimeText}>
-                    <View style={styles.TimeTextDateContainer}><Text style={styles.TimeTextDate}>{dateText}</Text></View>
-
                     <TouchableOpacity style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={styles.nowDayText}>오늘</Text></TouchableOpacity>
                 </View>
                 <View style={styles.TodoBlockContainer}>
@@ -209,20 +186,28 @@ const App = () => {
     const ToDoText = ({ todoList, toggleCheck, removeTodo }) => { // props로 값을 받아와서 사용
         return (
             <View style={styles.ToDoTextContainer}>
-                <ScrollView>
-                    {todoList.map((todo) => { // todoList배열목록을 todo로 순회
-                        return (
-                            <View key={todo.id} style={styles.ToDoAdd}>
-                                <View style={[styles.color, { backgroundColor: todo.color }]}></View>
-                                <TouchableWithoutFeedback onPress={() => toggleCheck(todo.id)}>
-                                    <Image style={styles.ToDoTextImage} source={todo.checked ? require('./img/icons/icon.png') : require('./img/icons/iconBack.png')} />
-                                </TouchableWithoutFeedback>
-                                <Text style={[styles.ToDoText, todo.checked ? { color: 'red' } : { color: 'black' }]}>{todo.text}</Text>
-                                <TouchableOpacity style={styles.ToDoRemoveBtn} onPress={() => removeTodo(todo.id)}><Icon name="remove" size={20} color="#D1D1D1"></Icon></TouchableOpacity>
-                            </View>
-                        );
-                    })}
-                </ScrollView>
+                {/* 저장된 할일이 없을경우, 할일이 없음을 표시하고, 할일이 있으면 할일 띄우기 */}
+                {todoList.length === 0 ? (
+                    <View style={styles.TodoTextNoContainer}>
+                        <Image source={require('./img/icons/background.png')} style={styles.TodoTextNoImg}></Image>
+                        <Text style={styles.TodoTextNoText}>할 일이 아직 없어요.</Text>
+                    </View>
+                ) : (
+                    <ScrollView>
+                        {todoList.map((todo) => { // todoList배열목록을 todo로 순회
+                            return (
+                                <View key={todo.id} style={styles.ToDoAdd}>
+                                    <View style={[styles.color, { backgroundColor: todo.color }]}></View>
+                                    <TouchableWithoutFeedback onPress={() => toggleCheck(todo.id)}>
+                                        <Image style={styles.ToDoTextImage} source={todo.checked ? require('./img/icons/icon.png') : require('./img/icons/iconBack.png')} />
+                                    </TouchableWithoutFeedback>
+                                    <Text style={[styles.ToDoText, todo.checked ? { color: '#B6B6B6' } : { color: 'black' }]}>{todo.text}</Text>
+                                    <TouchableOpacity style={styles.ToDoRemoveBtn} onPress={() => removeTodo(todo.id)}><Icon name="remove" size={20} color="#D1D1D1"></Icon></TouchableOpacity>
+                                </View>
+                            );
+                        })}
+                    </ScrollView>
+                )}
             </View>
         )
     }
@@ -267,29 +252,25 @@ const App = () => {
                 } catch (error) {
                     console.error("모달창 내부 데이터 저장 오류", error);
                 }
-
                 setText(''); // input란 초기화
                 setSelectColor('#FFFCE7') // 색상 초기화
-
-                // const a = await AsyncStorage.getItem(dateKey);
-                // const b = JSON.parse(a);
-                // console.log(JSON.stringify(b));
             };
         };
 
         // 색상 클릭시 해당 색상저장
-        const [selectColor, setSelectColor] = useState('#FFFCE7');
+        const [selectColor, setSelectColor] = useState('#F3F3F3');
         const changeColor = (color) => {
             setSelectColor(color);
         };
 
         // 색상마다 id와 color값 저장
         const colorOptions = [
-            { id: 1, color: '#FDF97F' },
+            { id: 1, color: '#FFF584' },
             { id: 2, color: '#C4F6B6' },
             { id: 3, color: '#FFA8A0' },
             { id: 4, color: '#DCBBFC' },
-        ]
+            { id: 5, color: '#BAE3F7' },
+        ];
 
         return (
             <View style={styles.AddModalContainer}>
@@ -302,16 +283,18 @@ const App = () => {
                     visible={modal} // 모달을 보이게할지 여부
                     onRequestClose={modalClick} // 안드로이드에서 뒤로가기 버튼 누를때 모달 안보이게하기
                 >
-                    <View style={styles.modalBackground}>
+                    <View style={styles.modalBackground} >
                         <View style={styles.modalContainer}>
                             <View style={styles.modalRemove}>
                                 <TouchableWithoutFeedback onPress={modalClick}><Icon name="close" style={styles.modalRemoveIcon} ></Icon></TouchableWithoutFeedback>
                             </View>
+                            <Image source={require('./img/icons/icon.png')} style={styles.modalIconImage}></Image>
                             <TextInput
-                                placeholder="할 일을 추가하세요."
+                                placeholder="오늘 할 일을 입력하세요."
                                 onChangeText={changeText}
                                 value={text}
                                 style={styles.modalInput}
+                                selectionColor="#CFCFCF"
                             ></TextInput>
                             <View style={styles.checkColorContainer}>
                                 {colorOptions.map((option) => (
@@ -336,7 +319,6 @@ const App = () => {
 
     // 텍스트(id, text, checked, color 정보가 담겨있음) 배열이 저장되는 곳
     const [todoList, setTodoList] = useState([]);
-
     // 체크버튼 누를시, 체크표시 (체크상태 변경)
     const toggleCheck = useCallback((id) => {
         setTodoList((prevList) => {
@@ -365,9 +347,7 @@ const App = () => {
         const loadTodos = async () => {
             const dateKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
             const storedTodos = await AsyncStorage.getItem(dateKey); // 저장소의 데이터를 꺼냄
-            // console.log("Dd"+dateKey);
-            // const today = await AsyncStorage.getItem("2025-1-4");
-            // console.log("dddd"+today);
+
             if (storedTodos) { // 데이터가 존재한다면, 아래 코드 실행
                 setTodoList(JSON.parse(storedTodos)); // 저장된 할 일을 로드
 
@@ -379,36 +359,6 @@ const App = () => {
 
 
     }, [selectedDate]);
-
-
-    // const getData = async () => {
-    //     const firstDay = new Date(nowYear,nowMonth,1);
-    //     const lastDay = new Date(nowYear,nowMonth+1, 0);
-    //     const firstDate = firstDay.getDate();
-    //     const lastDate = lastDay.getDate();
-    //     let i = 0;
-    //     for (i=firstDate; i<=lastDate; i++) {
-    //         const allDays = nowYear+"-"+nowMonth+"-"+i;
-    //         console.log(allDays);
-    //         const get = await AsyncStorage.getItem(allDays);
-    //     console.log("get"+get);
-
-    //         if(get) {
-    //             //
-    //         }
-    //     }
-
-
-    //     // const today = await AsyncStorage.getItem("2025-1-4");
-    //         // console.log("dddd"+today);
-    //     // const get = await AsyncStorage.getItem(allDays);
-    //     // console.log("get"+get)
-    // }
-    // getData();
-
-    const [circleCheck, setCircleCheck] = useState(false);
-
-
 
     // 저장소에 데이터 저장 ( todoList(텍스트관련 데이터)와 selectedDate(선택한 연도,달)의 값이 변경될때마다 실행)
     // --------------------- 할일 목록 저장 -------------------------- //
@@ -434,13 +384,10 @@ const App = () => {
 
     return (
         <View style={styles.mainContainer}>
-            {/* <CalendarIcon></CalendarIcon> */}
             <Calendar todoList={todoList}></Calendar>
             <TimeText></TimeText>
             <ToDoText todoList={todoList} toggleCheck={toggleCheck} removeTodo={removeTodo}></ToDoText>
             <AddModal setTodoList={setTodoList}></AddModal>
-
-
         </View>
     )
 }
@@ -474,73 +421,143 @@ const styles = StyleSheet.create({
     },
     calendarContainer: {
         width: '100%',
-        height: 120,
+        height: 140,
         // backgroundColor: '#F2F9FF',
     },
     calendarDateContainer: {
         flexDirection: 'row',
+        // marginTop: 20,
     },
+
     calendarTodayContainer: {
-        width: 150,
+        // width: 170,
+        width: '100%',
         height: 40,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         // marginBottom: 10,
-        marginTop: 17,
-        marginLeft: 17,
+        marginTop: 15,
+        marginLeft: 15,
 
+        // backgroundColor: 'blue',
         borderRadius: 15,
         padding: 5,
+        // position: 'relative',
+        // marginRight: 10,
     },
-    calendarTodayLeftRight: {
-        width: 20,
-        height: 20,
-        backgroundColor: '#C4D1F5',
-        textAlign: 'center',
-        borderRadius: 10,
-        marginTop: 2,
-        marginLeft: 10,
-        marginRight: 5,
+    calendarTodayLeftRightContainer: {
+        // flex: 1,
+        // justifyContent: 'space-between',
+        // alignItems:'flex-start',
+        flexDirection: 'row',
 
     },
+    calendarTodayLeft: {
+        width: 30,
+        height: 30,
+        backgroundColor: '#C4D1F5',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 5,
+        borderRadius: 10,
+    },
+    calendarTodayRight: {
+        width: 30,
+        height: 30,
+        backgroundColor: '#C4D1F5',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 30,
+        borderRadius: 10,
+    },
+    calendarTodayLeftIcon: {
+        textAlign: 'center',
+
+    },
+    calendarTodayRightIcon: {
+        textAlign: 'center',
+    },
     calendarToday: {
-        // textAlign: 'center',
+        width: 150,
+        height: 40,
+        // backgroundColor: 'yellow',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    calendarTodayText: {
         fontSize: 16,
         fontWeight: '600',
-        // marginRight: 20,
+        // marginRight: 12,
     },
+    calendarTodayDate: {
+        width: 50,
+        height: 30,
+        // backgroundColor: '#EFF4FC',
+        backgroundColor: '#FCDBD3',
+        // textAlign: 'center',
+        // alignItems:'center',
+        justifyContent: 'center',
+        // borderRadius: '100%',
+        borderRadius: 15,
+    },
+    calendarTodayDateText: {
+        textAlign: 'center',
+        fontWeight: '600',
+    },
+
     calendarDate: {
         width: 45,
-        height: 45,
+        height: 65,
         // backgroundColor: '#D7D6FB',
         borderRadius: 10, // 원 모양 만들기 위해 반지름 설정
         justifyContent: 'center', // 세로 중앙 정렬
         alignItems: 'center', // 가로 중앙 정렬
         marginLeft: 10,
         marginRight: 10,
+
         // borderWidth: 3,
         // borderColor: '#C4D1F5',
+        position: 'relative',
 
     },
     calendarDayText: {
         fontSize: 10,
         fontWeight: '600',
+        paddingTop: 5,
+        // paddingBottom: 5,
         color: '#D1D1D1',
+        position: 'absolute',
+        top: 0,
     },
+
     calendarDateText: {
         color: 'black',
+        position: 'absolute',
+        top: 23,
+    },
+    calendarDot: {
+        position: 'absolute',
+
+        top: 14,
+        fontSize: 35,
+        color: '#7B9AFC',
     },
 
     TimeTextContainer: {
-        marginTop: 10,
-        marginBottom: 15,
+        // marginTop: 10,
+        // marginBottom: 15,
         width: '100%',
-        height: 150,
+        // height: 150,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        // backgroundColor: '#EEEEEE',
+        // backgroundColor: '#C4D1F5',
+        // borderTopWidth: 2,
+        // borderColor: '#F3F3F3',
+        // paddingTop: 10,
+        // marginTop: 20,
     },
     TimeText: {
         width: '100%',
@@ -550,35 +567,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         // alignContent: 'center',
         textAlign: 'center',
-        backgroundColor: 'pink',
+        // backgroundColor: 'pink',
         flexDirection: 'row',
         // marginBottom: 10,
-        marginTop: 10,
+        // marginTop: 10,
     },
-    TimeTextDateContainer: {
-        width: 80,
-        height: 30,
-        backgroundColor: 'grey',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 10,
-        // textAlign: 'center',
 
-    },
-    TimeTextDate: {
-        fontSize: 15,
-        fontWeight: '600',
-        // width: '100%',
-        // height: 40,
-        // backgruondColor: 'blue',
-        // textAlign: 'center',
-        textAlign: 'center',
-    },
 
     nowDay: {
         width: 40,
         height: 23,
-        backgroundColor: '#FFA4A4',
+        backgroundColor: '#FF987F',
+        // backgroundColor: '#FA8F6E',
         marginLeft: 5,
         // textAlign: 'center',
         justifyContent: 'center',
@@ -597,20 +597,21 @@ const styles = StyleSheet.create({
     },
     TodoBlockContainer: {
         width: '100%',
-        height: 100,
+        height: 80,
         // backgroundColor: 'blue',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         // marginRight: 10,
+        // borderTopWidth: 2,
     },
     TodoBlock: {
 
-        width: 150,
-        height: 80,
+        width: 140,
+        height: 70,
         marginLeft: 20,
         marginRight: 2,  // 두 블록 사이 간격
-        backgroundColor: '#F2F9FF',  // 기본 색상
+        backgroundColor: '#EFF4FC',  // 기본 색상
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 20,
@@ -619,7 +620,7 @@ const styles = StyleSheet.create({
     },
     TodoBlockText: {
         fontSize: 12,
-        // color: '#C4D1F5',
+        // color: '#909090',
     },
     TodoBlockCount: {
         fontSize: 20,
@@ -640,6 +641,7 @@ const styles = StyleSheet.create({
         marginRight: 3,
     },
     ToDoTextContainer: {
+        flex: 1,
         // flexDirection: 'row',
         // justifyContent: 'space-between',
         // alignItems: 'center',
@@ -648,6 +650,23 @@ const styles = StyleSheet.create({
         // paddingHorizontal: 10,
         // backgroundColor: '#EEF1F6',
         paddingTop: 10,
+    },
+    TodoTextNoContainer: {
+        width: '100%',
+        height: 400,
+        // backgroundColor: 'lightgreen',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    TodoTextNoText: {
+        textAlign: 'center',
+        fontSize: 15,
+        color: '#D7D7D7',
+    },
+    TodoTextNoImg:{
+        marginBottom: 10,
+        width: 80,
+        height: 80,
     },
     ToDoAdd: {
         width: '100%',
@@ -683,7 +702,8 @@ const styles = StyleSheet.create({
         // backgroundColor: 'red',
         marginLeft: 15,
         marginRight: 0,
-        // borderRadius: 10,
+        borderRadius: 5,
+        // backgroundColor: '#DDDDDD',
     },
     AddModalContainer: {
         position: 'absolute',
@@ -719,24 +739,20 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: 320,
-        height: 300,
+        height: 350,
         backgroundColor: '#FFFFFF',
         borderRadius: 10,
         // justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        padding: 12,
     },
     modalInput: {
-        width: '100%',
+        width: '90%',
         height: 45,
-        marginTop: 20,
+        marginTop: 50,
         marginBottom: 30,
-        backgroundColor: '#FFFFFF',
-        borderWidth: 3,
-        borderColor: '#D7D6FB',
-        borderRadius: 10,
-        paddingLeft: 10,
-        paddingRight: 10,
+        borderBottomWidth: 2,
+        borderColor: '#CFCFCF',
     },
     modalRemove: {
         // flex: 1,
@@ -754,18 +770,29 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'grey',
     },
+    modalIconImage: {
+        // marginRight: 10,
+        marginBottom: 8,
+
+        // textAlign: 'center',
+        // justifyContent: 'center',
+    },
+    modalIconText: {
+        fontSize: 15,
+        fontWeight: '600',
+    },
     checkColorContainer: {
         flexDirection: 'row',
     },
     checkColor: {
-        width: 40,
-        height: 40,
+        width: 35,
+        height: 35,
         borderRadius: '100%',
         // backgroundColor: '#FFB9A4',
-        marginLeft: 15,
-        marginRight: 15,
+        marginLeft: 10,
+        marginRight: 10,
         marginBottom: 45,
-        justifyContent: 'center', // 세로로 중앙 정렬
+        justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
         textAlign: 'center',

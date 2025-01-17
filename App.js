@@ -6,107 +6,89 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {
 
+    // 선택된 날짜 저장
     const [selectedDate, setSelectedDate] = useState(new Date());
 
     const date = new Date();
-    const year = date.getFullYear(); // 현재클릭한 연도랑 사용자가 선택한 연도랑 같은지 비교하기위한 year객체 생성
-    const month = date.getMonth(); // 현재클릭한 달이랑 사용자가 선택한 달이랑 같은지 비교하기위한 month객체 생성
-    const dateDay = date.getDate(); // 현재클릭한 날짜랑 사용자가 선택한 날짜랑 같은지 비교하기위한 date객체 생성
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const dateDay = date.getDate();
     const nowMonth = selectedDate.getMonth() + 1;
     const nowYear = selectedDate.getFullYear();
     const nowDate = selectedDate.getDate();
 
     // 오늘 날짜인지 확인하는 함수
     const isToday = (selectedDate.getDate() === new Date().getDate() &&
-        selectedDate.getMonth() === new Date().getMonth() &&
-        selectedDate.getFullYear() === new Date().getFullYear());
-    // ----------------------------------------------------
+                    selectedDate.getMonth() === new Date().getMonth() &&
+                    selectedDate.getFullYear() === new Date().getFullYear());
 
-
-
-    // const dateText = `${nowMonth}월 ${nowDate}일`;
     const firstDay = new Date(nowYear, nowMonth, 1); // 해당 월의 1일 객체를 반환
     const lastDay = new Date(nowYear, nowMonth + 1, 0); // 해당 월의 마지막날 객체를 반환
     const firstDate = firstDay.getDate(); // 1 이라는 날짜값만 반환
     const lastDate = lastDay.getDate(); // 마지막 날짜값만 반환
 
-    // const [days,setDays] = useState([]); 대신 useMemo를 사용하여 날짜배열 관리
+    // 날짜 배열을 useMemo로 관리
     const days = useMemo(() => {
-        // const firstDay = new Date(nowYear, nowMonth, 1); // 해당 월의 1일 객체를 반환
-        // const lastDay = new Date(nowYear, nowMonth + 1, 0); // 해당 월의 마지막날 객체를 반환
-        // const firstDate = firstDay.getDate(); // 1 이라는 날짜값만 반환
-        // const lastDate = lastDay.getDate(); // 마지막 날짜값만 반환
-
-        const days = []; // 날짜를 저장할 빈 배열생성
+        const daysArray = []; // 날짜를 저장할 빈 배열생성
         for (let i = firstDate; i <= lastDate; i++) {
-            days.push(i); // 1일부터 마지막날까지 배열에 추가
+            daysArray.push(i); // 1일부터 마지막날까지 배열에 추가
         }
-        // setDays(newDays); // days 배열안에 1일부터 마지막날까지 날짜가 저장된 newDays를 저장
-        return days;
-    }, [nowYear, nowMonth]);
+        return daysArray;
+    }, [selectedDate]);
 
-// 월 변경 함수 ( < > 누르면 direction값에 따라 월 변경 )
-const changeMonth = useCallback((direction) => {
-    const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
-    newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
-    setSelectedDate(newDate); // 변경된 월을 selectedDate에 저장
-}, [selectedDate]);
+    // 월 변경 함수 ( < > 누르면 direction값에 따라 월 변경 )
+    const changeMonth = useCallback((direction) => {
+        const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
+        newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
+        setSelectedDate(newDate); // 변경된 월을 selectedDate에 저장
+    }, [selectedDate]);
 
-// const [click, setClick] = useState(false);
-// const dateClick = () => {
-//     setClick(!click);
-// }
- // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
- const handleDateClick = useCallback((day) => {
-    const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성
-    newDate.setDate(day); // 클릭한 날짜를 newDate객체에 저장
-    setSelectedDate(newDate); // 저장된 날짜를 selectedDate에 저장
-},[selectedDate]);
+    // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
+    const handleDateClick = useCallback((day) => {
+        const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성
+        newDate.setDate(day); // 클릭한 날짜를 newDate객체에 저장
+        setSelectedDate(newDate); // 저장된 날짜를 selectedDate에 저장
+    }, [selectedDate]);
 
-useEffect(() => {
-    getData();  // 컴포넌트 마운트 시 데이터 가져오기
-}, [selectedDate]);  // 연도나 월이 변경될 때마다 다시 데이터 로드
-
-
-const [a, setA] = useState({});
-const getData = async () => {
-
-    let updatedA = {}; // 날짜별로 false, true저장 (데이터의 유무)
- 
-    for (let i = firstDate; i <= lastDate; i++) {
-        const allDays = nowYear + "-" + nowMonth + "-" + i;
-        const get = await AsyncStorage.getItem(allDays);
-        if (get === null || get === "[]") {
-            // 데이터가 없으면 false
-            updatedA[allDays] = false;
-        } else {
-            // 데이터가 있으면 true
-            updatedA[allDays] = true;
+    // 날짜마다 데이터가 있으면 . 표시유무 지정
+    const [a, setA] = useState({});
+    const getData = useCallback(async () => {
+        let updatedA = {};
+        for (let i = firstDate; i <= lastDate; i++) {
+            const allDays = `${nowYear}-${nowMonth}-${i}`;
+            const get = await AsyncStorage.getItem(allDays);
+            if (get === "[]") {
+                // 데이터가 없으면 false
+                updatedA[allDays] = false;
+            } else {
+                // 데이터가 있으면 true
+                updatedA[allDays] = true;
+            }
         }
-    }
-    setA(updatedA);
-}
+        setA(updatedA);
+    }, [selectedDate]);
 
-const [click, setClick] = useState({});
-const dateClick = (day) => {
-    setClick((prevState) => {
-        const newState = {};
-        
-        // 이전에 클릭된 날짜를 모두 false로 설정하고
-        for (const key in prevState) {
-            newState[key] = false;
-        }
-        
-        // 클릭한 날짜는 true로 설정
-        newState[day] = true;
+    useEffect(() => {
+        getData(); 
+    }, [selectedDate]); 
 
-        return newState;
-    });
-};
-    
+    // 클릭한 날짜 저장 (클릭한 날짜에 테두리 지정하기 위함)
+    const [click, setClick] = useState({});
+    const dateClick = (day) => {
+        setClick((prevState) => {
+            const newState = {};
+            // 이전에 클릭된 날짜를 모두 false로 설정하고
+            for (const key in prevState) {
+                newState[key] = false;
+            }
+            // 클릭한 날짜는 true로 설정
+            newState[day] = true;
+            return newState;
+        });
+    };
+
     // ------------------------ 달력 ------------------------ //
     const Calendar = () => {
-
         return (
             <View style={styles.calendarContainer}>
                 <View style={styles.calendarTodayContainer}>
@@ -137,15 +119,13 @@ const dateClick = (day) => {
                                 case 6: dayText = "토"; break;
                             }
 
-                            const dayKey = `${nowYear}-${nowMonth}-${day}`;  // 날짜 포맷: 'YYYY-MM-DD'
-
+                            const dayKey = `${nowYear}-${nowMonth}-${day}`;
                             return (
-                                <TouchableOpacity key={day} onPress={() => {handleDateClick(day); dateClick(day);}}>
-                                    {/* click === true ? {backgroundColor: 'red'} : {backgroundColor: 'blue'} */}
-                                    <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#F9F9F9' }, click[day] ? {borderWidth: 3, borderColor: '#B7C6DA'} : {borderWidth: 3, borderColor: '#F9F9F9'}]}>
+                                <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); }}>
+                                    <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#F9F9F9' }, click[day] ? { borderWidth: 3, borderColor: '#B6BCD2' } : { borderWidth: 3, borderColor: '#F9F9F9' }]}>
                                         <Text style={[styles.calendarDayText, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#898989' }]}>{dayText}</Text>
                                         <Text style={styles.calendarDateText}>{day}</Text>
-                                        <Text style={[styles.calendarDot, a[dayKey] ? { display: 'visible' } : { display: 'none' }]}>.</Text>
+                                        <Text style={[styles.calendarDot, a[dayKey] ? { display: 'block' } : { display: 'none' }]}>.</Text>
                                     </View>
                                 </TouchableOpacity>
                             )
@@ -158,17 +138,12 @@ const dateClick = (day) => {
 
     // ------------------------ 현재 날짜 표시 & 할일 갯수 표시 ------------------------ //
     const TimeText = () => {
-        const date = new Date();
-        // const year = date.getFullYear();
-        // const month = date.getMonth() + 1;
-        // const day = date.getDate();
-        // const nowDate = year + "." + month + "." + day;
         return (
             <View style={styles.TimeTextContainer}>
                 <View style={styles.TimeText}>
-                    <TouchableOpacity style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={styles.nowDayText}>오늘</Text></TouchableOpacity>
+                    <TouchableOpacity style={[styles.nowDay, isToday ? { display: 'flex'} : { display: 'none' }]}><Text style={styles.nowDayText}>오늘</Text></TouchableOpacity>
                 </View>
-                <View style={styles.TodoBlockContainer}>
+                <View style={[styles.TodoBlockContainer, isToday ? { marginTop: 30} : {marginTop: 0}]}>
                     <View style={styles.TodoBlock}>
                         <Text style={styles.TodoBlockCount}>{todoListCount}</Text>
                         <Text style={styles.TodoBlockText}>오늘 할일</Text>
@@ -202,7 +177,7 @@ const dateClick = (day) => {
                                         <Image style={styles.ToDoTextImage} source={todo.checked ? require('./img/icons/icon.png') : require('./img/icons/iconBack.png')} />
                                     </TouchableWithoutFeedback>
                                     <Text style={[styles.ToDoText, todo.checked ? { color: '#B6B6B6' } : { color: 'black' }]}>{todo.text}</Text>
-                                    <TouchableOpacity style={styles.ToDoRemoveBtn} onPress={() => removeTodo(todo.id)}><Icon name="remove" size={20} color="#D1D1D1"></Icon></TouchableOpacity>
+                                    <TouchableOpacity style={styles.ToDoRemoveBtn} onPress={() => removeTodo(todo.id)}><Icon name="remove" size={23} color="#D1D1D1"></Icon></TouchableOpacity>
                                 </View>
                             );
                         })}
@@ -237,7 +212,6 @@ const dateClick = (day) => {
                     text: text, // 사용자가 입력한 텍스트 저장
                     checked: false, // 체크 여부 저장
                     color: selectColor, // 색상 정보 저장
-
                 };
                 // props로 전송받은 setTodoList(텍스트 배열)의 상태 업데이트
                 setTodoList((prevList) => {
@@ -338,26 +312,19 @@ const dateClick = (day) => {
         });
     }, []);
 
-
-
-
     // 저장소의 데이터 조회 ( selectedDate(선택한 연도,달) 의 값이변경될때마다 실행 )
     // --------------------- 할일 목록 조회 ------------------------ //
     useEffect(() => {
         const loadTodos = async () => {
             const dateKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
             const storedTodos = await AsyncStorage.getItem(dateKey); // 저장소의 데이터를 꺼냄
-
             if (storedTodos) { // 데이터가 존재한다면, 아래 코드 실행
                 setTodoList(JSON.parse(storedTodos)); // 저장된 할 일을 로드
-
             } else {
                 setTodoList([]); // 저장된 할일이 없으면 빈배열로 설정
             }
         };
         loadTodos();
-
-
     }, [selectedDate]);
 
     // 저장소에 데이터 저장 ( todoList(텍스트관련 데이터)와 selectedDate(선택한 연도,달)의 값이 변경될때마다 실행)
@@ -399,26 +366,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'white',
     },
-    calendarIconContainer: {
-        // flex: 1,
-        width: '100%',
-        height: 50,
-        // backgroundColor: 'grey',
-        alignItems: 'center', // 세로 중앙 정렬
-        // justifyContent: 'center', // 가로 중앙 정렬
-        flexDirection: 'row', // 기본 방향 설정 (가로 방향)
-        // position: 'absolute', // 화면 상단에 고정
-        // left: 0, // 왼쪽 끝에 배치
-        // marginTop: 5,
-    },
-    calendarView: {
-        width: 100,
-        height: 30,
-        // backgroundColor: 'blue',
-        // marginLeft: 20,
-        marginLeft: 10,
-        marginTop: 20,
-    },
+
     calendarContainer: {
         width: '100%',
         height: 140,
@@ -430,28 +378,18 @@ const styles = StyleSheet.create({
     },
 
     calendarTodayContainer: {
-        // width: 170,
         width: '100%',
         height: 40,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // marginBottom: 10,
         marginTop: 15,
         marginLeft: 15,
-
-        // backgroundColor: 'blue',
         borderRadius: 15,
         padding: 5,
-        // position: 'relative',
-        // marginRight: 10,
     },
     calendarTodayLeftRightContainer: {
-        // flex: 1,
-        // justifyContent: 'space-between',
-        // alignItems:'flex-start',
         flexDirection: 'row',
-
     },
     calendarTodayLeft: {
         width: 30,
@@ -459,7 +397,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#C4D1F5',
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: 5,
+        marginRight: 10,
         borderRadius: 10,
     },
     calendarTodayRight: {
@@ -472,11 +410,10 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     calendarTodayLeftIcon: {
-        textAlign: 'center',
-
+        // textAlign: 'center',
     },
     calendarTodayRightIcon: {
-        textAlign: 'center',
+        // textAlign: 'center',
     },
     calendarToday: {
         width: 150,
@@ -489,49 +426,38 @@ const styles = StyleSheet.create({
     calendarTodayText: {
         fontSize: 16,
         fontWeight: '600',
-        // marginRight: 12,
     },
     calendarTodayDate: {
         width: 50,
-        height: 30,
-        // backgroundColor: '#EFF4FC',
-        backgroundColor: '#FCDBD3',
-        // textAlign: 'center',
-        // alignItems:'center',
+        height: 26,
+        // backgroundColor: '#FDC4B7',
+        backgroundColor: '#FF987F',
         justifyContent: 'center',
-        // borderRadius: '100%',
-        borderRadius: 15,
+        borderRadius: 10,
     },
     calendarTodayDateText: {
         textAlign: 'center',
         fontWeight: '600',
+        color: '#FFFFFF',
     },
-
     calendarDate: {
         width: 45,
         height: 65,
-        // backgroundColor: '#D7D6FB',
-        borderRadius: 10, // 원 모양 만들기 위해 반지름 설정
-        justifyContent: 'center', // 세로 중앙 정렬
-        alignItems: 'center', // 가로 중앙 정렬
+        borderRadius: 10, 
+        justifyContent: 'center',
+        alignItems: 'center',
         marginLeft: 10,
         marginRight: 10,
-
-        // borderWidth: 3,
-        // borderColor: '#C4D1F5',
         position: 'relative',
-
     },
     calendarDayText: {
         fontSize: 10,
         fontWeight: '600',
         paddingTop: 5,
-        // paddingBottom: 5,
         color: '#D1D1D1',
         position: 'absolute',
         top: 0,
     },
-
     calendarDateText: {
         color: 'black',
         position: 'absolute',
@@ -539,55 +465,34 @@ const styles = StyleSheet.create({
     },
     calendarDot: {
         position: 'absolute',
-
-        top: 14,
+        top: 12,
         fontSize: 35,
         color: '#7B9AFC',
     },
 
     TimeTextContainer: {
-        // marginTop: 10,
-        // marginBottom: 15,
         width: '100%',
-        // height: 150,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        // backgroundColor: '#C4D1F5',
-        // borderTopWidth: 2,
-        // borderColor: '#F3F3F3',
-        // paddingTop: 10,
-        // marginTop: 20,
+        borderTopWidth: 2,
+        borderColor: '#F3F3F3',
+        paddingTop: 20,
+        marginTop: 10,
     },
     TimeText: {
         width: '100%',
         height: 30,
-        // flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center',
-        // alignContent: 'center',
-        textAlign: 'center',
-        // backgroundColor: 'pink',
         flexDirection: 'row',
-        // marginBottom: 10,
-        // marginTop: 10,
     },
-
-
     nowDay: {
         width: 40,
         height: 23,
         backgroundColor: '#FF987F',
-        // backgroundColor: '#FA8F6E',
-        marginLeft: 5,
-        // textAlign: 'center',
         justifyContent: 'center',
         alignItems: 'center',
-        // flexDirection: 'row',
-        borderRadius: 10,
-        paddingBottom: 2,
-        // marginTop: 2,
-
+        borderRadius: 15,
     },
     nowDayText: {
         textAlign: 'center',
@@ -597,30 +502,24 @@ const styles = StyleSheet.create({
     },
     TodoBlockContainer: {
         width: '100%',
-        height: 80,
-        // backgroundColor: 'blue',
+        height: 30,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        // marginRight: 10,
-        // borderTopWidth: 2,
+        marginBottom: 30,
     },
     TodoBlock: {
-
         width: 140,
         height: 70,
-        marginLeft: 20,
-        marginRight: 2,  // 두 블록 사이 간격
+        marginLeft: 10,
+        marginRight: 10,
         backgroundColor: '#EFF4FC',  // 기본 색상
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 20,
-        // borderWidth: 4,
-        // borderColor: '#C4D1F5',
     },
     TodoBlockText: {
         fontSize: 12,
-        // color: '#909090',
     },
     TodoBlockCount: {
         fontSize: 20,
@@ -628,33 +527,19 @@ const styles = StyleSheet.create({
         fontWeight: '800',
     },
     deleteContainer: {
-        flexDirection: 'row', // 가로 방향으로 정렬
-        justifyContent: 'flex-end', // 오른쪽 끝으로 정렬
-        alignItems: 'flex-start', // 위쪽 끝으로 정렬
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'flex-start',
         width: '100%',
-    },
-    deleteBtn: {
-        width: 50,
-        height: 30,
-        // backgroundColor:'white',
-        textAlign: 'center',
-        marginRight: 3,
     },
     ToDoTextContainer: {
-        flex: 1,
-        // flexDirection: 'row',
-        // justifyContent: 'space-between',
-        // alignItems: 'center',
         width: '100%',
         height: '100%',
-        // paddingHorizontal: 10,
-        // backgroundColor: '#EEF1F6',
         paddingTop: 10,
     },
     TodoTextNoContainer: {
         width: '100%',
         height: 400,
-        // backgroundColor: 'lightgreen',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -663,72 +548,61 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#D7D7D7',
     },
-    TodoTextNoImg:{
+    TodoTextNoImg: {
         marginBottom: 10,
         width: 80,
         height: 80,
     },
     ToDoAdd: {
         width: '100%',
-        height: 60,
+        height: 48,
         // backgroundColor: '#A3DBAB',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         // textAlign: 'center',
+        // borderTopWidth: 2,
+        // borderBottomWidth:2 ,
+        // borderColor: '#F7F7F7',
+        marginBottom: 10,
     },
     ToDoTextImage: {
-        marginLeft: 5,
+        marginLeft: 8,
         marginRight: 10,
     },
     ToDoText: {
         flex: 1,
-        // textAlign: 'center',
         marginRight: 10,
-        // backgroundColor: '#FFFFFF',
         fontSize: 15,
     },
     ToDoRemoveBtn: {
         textAlign: 'center',
         marginRight: 20,
-        // size: 40,
-        // fontSize: 
-        // backgroundColor: '#FFFFFF',
-        // display: 'none',
     },
     color: {
         width: 4,
         height: 38,
-        // backgroundColor: 'red',
         marginLeft: 15,
         marginRight: 0,
         borderRadius: 5,
-        // backgroundColor: '#DDDDDD',
     },
     AddModalContainer: {
         position: 'absolute',
         bottom: 30,
         right: 30,
-        // fontWeight: '100',
     },
     AddModalBtn: {
-        // fontSize: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        // backgroundColor: '#D7D6FB',
         backgroundColor: '#C4D1F5',
         width: 70,
         height: 70,
         borderRadius: '100%',
-        // textAlign: 'center',
-        // flexDirection: 'row',
-
     },
     AddModalBtnText: {
-        fontSize: 35,
+        fontSize: 40,
         fontWeight: '800',
         color: '#FFFFFF',
-        // textAlign: 'center',
     },
     // 모달---------------------------
     modalBackground: {
@@ -739,43 +613,31 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: 320,
-        height: 350,
+        height: 370,
         backgroundColor: '#FFFFFF',
         borderRadius: 10,
-        // justifyContent: 'center',
         alignItems: 'center',
         padding: 12,
     },
     modalInput: {
         width: '90%',
         height: 45,
-        marginTop: 50,
+        marginTop: 40,
         marginBottom: 30,
         borderBottomWidth: 2,
         borderColor: '#CFCFCF',
     },
     modalRemove: {
-        // flex: 1,
-        // justifyContent: 'flex-end',
-        // flexDirection: 'row',
-        // justifyContent: 'space-between',
         alignItems: 'flex-end',
         width: '100%',
-        height: 20,
-        // backgroundColor: 'blue',
+        height: 30,
     },
     modalRemoveIcon: {
-        // alignItems: 'flex-start',
-        // backgroundColor: 'green',
-        fontSize: 20,
-        color: 'grey',
+        fontSize: 30,
+        color: '#DEDEDE',
     },
     modalIconImage: {
-        // marginRight: 10,
         marginBottom: 8,
-
-        // textAlign: 'center',
-        // justifyContent: 'center',
     },
     modalIconText: {
         fontSize: 15,
@@ -788,7 +650,6 @@ const styles = StyleSheet.create({
         width: 35,
         height: 35,
         borderRadius: '100%',
-        // backgroundColor: '#FFB9A4',
         marginLeft: 10,
         marginRight: 10,
         marginBottom: 45,
@@ -798,12 +659,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     checkColorIcon: {
-        // justifyContent: 'center', // 세로로 중앙 정렬
-        // alignItems: 'center', 
-        // flexDirection: 'row',
         textAlign: 'center',
         fontSize: 20,
-        color: '#FFFFFF',
         display: 'none',
     },
     modalSave: {
@@ -813,15 +670,12 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center', // 세로로 중앙 정렬
         alignItems: 'center',
-
     },
     modalSaveCircle: {
         justifyContent: 'center',
         alignContent: 'center',
-        // flexDirection: 'row',
     },
     modalSaveText: {
-        // alignContent: 'center',
         fontSize: 25,
         textAlign: 'center',
         color: 'white',

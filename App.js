@@ -73,7 +73,7 @@ const App = () => {
     useEffect(() => {
         getData();
         // 연도, 월이 바뀌면 그에 맞는 데이터로 업데이트한다.
-    }, [getData,selectedDate]);
+    }, [getData, selectedDate]);
 
     // 클릭한 날짜 저장 (클릭한 날짜에 테두리 지정하기 위함)
     const [click, setClick] = useState({});
@@ -95,17 +95,10 @@ const App = () => {
         return (
             <View style={styles.calendarContainer}>
                 <View style={styles.calendarTodayContainer}>
+                    {/* 다크모드 추가 */}
                     <View style={styles.calendarToday}>
-                        <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
-                    </View>
-                    <View style={styles.calendarTodayDate}>
-                        <View style={styles.calendarTodayDateBox}>
-                            <Image source={require('./img/icons/iconDate.png')}></Image>
-                            <Text style={styles.calendarTodayDateText}>{nowDate}일</Text>
-                        </View>
-                    </View>
-                    <View style={styles.calendarTodayLeftRightContainer}>
                         <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calendarTodayLeft}><Icon name="chevron-left" size={20} color="#FFFFFF" style={styles.calendarTodayLeftIcon}></Icon></TouchableOpacity>
+                        <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
                         <TouchableOpacity onPress={() => changeMonth(1)} style={styles.calendarTodayRight}><Icon name="chevron-right" size={20} color="#FFFFFF" style={styles.calendarTodayRightIcon}></Icon></TouchableOpacity>
                     </View>
                 </View>
@@ -149,6 +142,11 @@ const App = () => {
                 <View style={styles.TimeText}>
                     <View style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={styles.nowDayText}>오늘</Text></View>
                 </View>
+                <View style={[styles.clickDate, isToday ? {marginBottom: 0} : {marginBottom: 30}]}>
+                    <Image source={require('./img/icons/iconDate.png')}></Image>
+                    <Text style={styles.clickDateText}>{nowDate}일</Text>
+                    <Image source={require('./img/icons/iconDate.png')}></Image>
+                </View>
                 <View style={[styles.TodoBlockContainer, isToday ? { marginTop: 30 } : { marginTop: 0 }]}>
                     <View style={styles.TodoBlock}>
                         <Text style={styles.TodoBlockCount}>{todoListCount}</Text>
@@ -159,6 +157,7 @@ const App = () => {
                         <Text style={styles.TodoBlockText}>완료된 할일</Text>
                     </View>
                 </View>
+        
             </View>
         )
     };
@@ -386,42 +385,46 @@ const styles = StyleSheet.create({
 
     calendarTodayContainer: {
         width: '100%',
-        height: 45,
+        // height: 45,
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        // backgroundColor: 'blue',
+        justifyContent: 'flex-start',
         alignItems: 'center',
-        marginTop: 15,
-        marginBottom: 15,
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 30,
+        // marginTop: 15,
+        // marginBottom: 15,
     },
-    calendarTodayLeftRightContainer: {
-        flex: 1,
-        flexDirection: 'row',
-    },
-    calendarTodayLeft: {
-        width: 30,
-        height: 30,
-        backgroundColor: '#C4D1F5',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginLeft: 10,
-        marginRight: 10,
-        borderRadius: 10,
-    },
-    calendarTodayRight: {
-        width: 30,
-        height: 30,
-        backgroundColor: '#C4D1F5',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
-        marginRight: 10,
-    },
+    // calendarTodayLeftRightContainer: {
+    //     flex: 1,
+    //     flexDirection: 'row',
+    // },
+    // calendarTodayLeft: {
+    //     width: 30,
+    //     height: 30,
+    //     backgroundColor: '#C4D1F5',
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     marginLeft: 10,
+    //     marginRight: 10,
+    //     borderRadius: 10,
+    // },
+    // calendarTodayRight: {
+    //     width: 30,
+    //     height: 30,
+    //     backgroundColor: '#C4D1F5',
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    //     borderRadius: 10,
+    //     marginRight: 10,
+    // },
     calendarToday: {
-        flex: 1,
-        width: 120,
+        // flex: 1,
+        width: 140,
         height: 30,
         backgroundColor: '#C4D1F5',
-        marginLeft: 10,
+        // marginLeft: 10,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
@@ -430,11 +433,15 @@ const styles = StyleSheet.create({
     calendarTodayText: {
         fontSize: 14,
         fontWeight: '500',
+        // color: 'white',
+        marginLeft: 10,
+        marginRight: 10,
     },
     calendarTodayDate: {
-        flex: 2,
-        width: '100%',
-        height: 40,
+        // flex: 1,
+        // width: '100%',
+        // height: 40,
+        backgroundColor: 'yellow',
         justifyContent: 'center',
         borderRadius: 10,
         justifyContent: 'center',
@@ -490,7 +497,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        marginTop: 10,
+        // marginTop: 10,
+        // backgroundColor: 'grey',
     },
     TimeText: {
         width: '100%',
@@ -528,15 +536,33 @@ const styles = StyleSheet.create({
         backgroundColor: '#EFF4FC',  // 기본 색상
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 20,
+        borderRadius: 10,
     },
     TodoBlockText: {
-        fontSize: 12,
+        fontSize: 13,
     },
     TodoBlockCount: {
         fontSize: 20,
         marginBottom: 5,
         fontWeight: '800',
+    },
+    clickDate : {
+        width: '100%',
+        // backgroundColor: 'yellow',
+        flexDirection: 'row',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // paddingLeft: 30,
+        // marginTop: 10,
+        marginBottom: 10,
+
+
+    },
+    clickDateText : {
+        marginLeft: 7,
+        marginRight: 7,
+        fontWeight: '500',
     },
     deleteContainer: {
         flexDirection: 'row',
@@ -546,9 +572,13 @@ const styles = StyleSheet.create({
     },
     ToDoTextContainer: {
         flex: 1,
-        width: '100%',
+        width: '93%',
         height: '100%',
         paddingTop: 10,
+        // backgroundColor: 'lightgrey',
+        // borderWidth: 3,
+        // borderColor: 'green',
+        // borderRadius: 20,
     },
     TodoTextNoContainer: {
         width: '100%',

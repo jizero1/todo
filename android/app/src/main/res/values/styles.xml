@@ -3,7 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="android:statusBarColor">@color/white</item>
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <item name="android:windowLightStatusBar">true</item> <!-- 아이콘 색상을 어둡게 -->
     </style>
 
 </resources>

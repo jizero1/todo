@@ -28,6 +28,7 @@ build/
 .idea
 .gradle
 local.properties
+gradle.properties
 *.iml
 *.hprof
 .cxx/
@@ -72,3 +73,9 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+
+# Ignore gradle.properties file in android folder
+/android/gradle.properties
+
+todo/android/gradle.properties

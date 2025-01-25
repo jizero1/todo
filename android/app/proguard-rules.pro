@@ -8,3 +8,14 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+
+# 기본적으로 모든 코드 난독화를 비활성화
+-dontobfuscate
+
+# 기본적으로 모든 코드 최적화 비활성화
+-dontoptimize
+
+# 모든 클래스가 난독화되지 않도록 하기 위해 추가적인 keep 규칙을 적용
+-keep class * {
+    *;
+}

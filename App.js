@@ -95,11 +95,14 @@ const App = () => {
         return (
             <View style={styles.calendarContainer}>
                 <View style={styles.calendarTodayContainer}>
-                    {/* 다크모드 추가 */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <Image source={require('./img/icons/icon.png')}></Image>
+                        <View style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={{ fontSize: 14, fontWeight: '700', color: '#FFFFFF' }}>오늘</Text></View>
+                    </View>
                     <View style={styles.calendarToday}>
-                        <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calendarTodayLeft}><Icon name="chevron-left" size={20} color="#FFFFFF" style={styles.calendarTodayLeftIcon}></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calendarTodayLeft}><Icon name="chevron-left" size={22} color="black" marginTop="3"></Icon></TouchableOpacity>
                         <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
-                        <TouchableOpacity onPress={() => changeMonth(1)} style={styles.calendarTodayRight}><Icon name="chevron-right" size={20} color="#FFFFFF" style={styles.calendarTodayRightIcon}></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(1)} style={styles.calendarTodayRight}><Icon name="chevron-right" size={22} color="black" marginTop="3"></Icon></TouchableOpacity>
                     </View>
                 </View>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -123,7 +126,9 @@ const App = () => {
                                 <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); }}>
                                     <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }, click[day] ? { borderWidth: 3, borderColor: '#B6BCD2' } : { borderWidth: 3, borderColor: '#FFFFFF' }]}>
                                         <Text style={[styles.calendarDayText, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#898989' }]}>{dayText}</Text>
+
                                         <Text style={styles.calendarDateText}>{day}</Text>
+
                                         <Text style={[styles.calendarDot, a[dayKey] ? { display: 'block' } : { display: 'none' }]}>.</Text>
                                     </View>
                                 </TouchableOpacity>
@@ -135,19 +140,66 @@ const App = () => {
         )
     }
 
+    const [clickMood, setClickMood] = useState(false);
+    const [selectedMood, setSelectedMood] = useState(null);
+    const mood = () => {
+        setClickMood(!clickMood);
+    }
+    const moodImages = [
+        require('./img/icons/icon.png'),
+        require('./img/icons/icon.png'),
+        require('./img/icons/icon.png'),
+        require('./img/icons/icon.png'),
+        require('./img/icons/icon.png'),
+    ]
+
+    // console.log(selectedMood);
+    const saveMood = async(mood) => {
+        try {
+            const moodKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
+            console.log("기분저장중~",mood);
+            await AsyncStorage.setItem(moodKey, JSON.stringify(mood));
+            console.log("기분저장성공", mood);
+        } catch(error) {
+            console.error("기분저장실패", error);
+        }
+    }
+    const loadMood = async() => {
+        try {
+            const moodKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
+            const storedMood = await AsyncStorage.getItem(moodKey);
+            if (storedMood !== null) {
+                setSelectedMood(JSON.parse(storedMood));
+                console.log("기분꺼내기 성공",storedMood);
+                
+            } 
+        } catch (error) {
+            console.error("기분꺼내기 실패", error);
+        }
+    }
+    useEffect(() => {
+        loadMood();
+    },[selectedDate]);
+
+    const handleMood = (mood) => {
+        setSelectedMood(mood);
+        saveMood(mood); // 저장소에 저장
+        setClickMood(false);
+    }
     // ------------------------ 현재 날짜 표시 & 할일 갯수 표시 ------------------------ //
     const TimeText = () => {
         return (
             <View style={styles.TimeTextContainer}>
-                <View style={styles.TimeText}>
-                    <View style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={styles.nowDayText}>오늘</Text></View>
-                </View>
-                <View style={[styles.clickDate, isToday ? {marginBottom: 0} : {marginBottom: 30}]}>
-                    <Image source={require('./img/icons/iconDate.png')}></Image>
-                    <Text style={styles.clickDateText}>{nowDate}일</Text>
-                    <Image source={require('./img/icons/iconDate.png')}></Image>
-                </View>
-                <View style={[styles.TodoBlockContainer, isToday ? { marginTop: 30 } : { marginTop: 0 }]}>
+                <View style={styles.TodoBlockContainer}>
+                    <TouchableOpacity onPress={mood} style={styles.TodoBlockDate}>
+                        {selectedMood ? (
+                            <Image source={selectedMood}></Image>)
+                            : (<Text>+</Text>
+                        )}
+
+                        <Text style={{ fontWeight: '600' }}>{nowDate}일</Text>
+                    </TouchableOpacity>
+
                     <View style={styles.TodoBlock}>
                         <Text style={styles.TodoBlockCount}>{todoListCount}</Text>
                         <Text style={styles.TodoBlockText}>오늘 할일</Text>
@@ -156,8 +208,18 @@ const App = () => {
                         <Text style={styles.TodoBlockCount}>{todoListCountCheck}</Text>
                         <Text style={styles.TodoBlockText}>완료된 할일</Text>
                     </View>
+
                 </View>
-        
+                {clickMood && (
+                    <View style={styles.moodContainer}>
+                        {moodImages.map((img, index) => (
+                            <TouchableOpacity key={index} onPress={() => handleMood(img)}>
+                                <Image source={img} style={styles.moodOption} />
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
+
             </View>
         )
     };
@@ -388,7 +450,7 @@ const styles = StyleSheet.create({
         // height: 45,
         flexDirection: 'row',
         // backgroundColor: 'blue',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         alignItems: 'center',
         paddingLeft: 20,
         paddingRight: 20,
@@ -396,10 +458,13 @@ const styles = StyleSheet.create({
         // marginTop: 15,
         // marginBottom: 15,
     },
-    // calendarTodayLeftRightContainer: {
-    //     flex: 1,
-    //     flexDirection: 'row',
-    // },
+    calendarTodayImg: {
+        // justifyContent: 'flex-start',
+    },
+    calendarTodayLeftRightContainer: {
+        //    backgroundColor: 'yellow',
+        //    margin-
+    },
     // calendarTodayLeft: {
     //     width: 30,
     //     height: 30,
@@ -423,19 +488,20 @@ const styles = StyleSheet.create({
         // flex: 1,
         width: 140,
         height: 30,
-        backgroundColor: '#C4D1F5',
+        // backgroundColor: '#C4D1F5',
+        // backgroundColor: '#F2ECE3',
         // marginLeft: 10,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
-        borderRadius: 10,
+        // borderRadius: 10,
     },
     calendarTodayText: {
         fontSize: 14,
         fontWeight: '500',
         // color: 'white',
-        marginLeft: 10,
-        marginRight: 10,
+        marginLeft: 5,
+        marginRight: 5,
     },
     calendarTodayDate: {
         // flex: 1,
@@ -463,17 +529,18 @@ const styles = StyleSheet.create({
         marginTop: 3,
     },
     calendarDate: {
-        width: 45,
-        height: 65,
-        borderRadius: 10,
+        width: 50,
+        height: 60,
+        borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 10,
         marginRight: 10,
         position: 'relative',
+        // backgroundColor: '#F7F6F4',
     },
     calendarDayText: {
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '600',
         paddingTop: 5,
         color: '#D1D1D1',
@@ -483,6 +550,7 @@ const styles = StyleSheet.create({
     calendarDateText: {
         color: 'black',
         position: 'absolute',
+        // fontSize: 15,
         top: 23,
     },
     calendarDot: {
@@ -513,6 +581,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
+        marginLeft: 10,
     },
     nowDayText: {
         textAlign: 'center',
@@ -526,7 +595,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 40,
+        marginTop: 30,
+    },
+    TodoBlockDate: {
+        width: 60,
+        height: 60,
+        backgroundColor: '#F7F6F6',
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+        marginLeft: 15,
+        marginRight: 10,
+        // position: 'absolute',
     },
     TodoBlock: {
         width: 140,
@@ -546,7 +628,16 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         fontWeight: '800',
     },
-    clickDate : {
+    moodContainer: {
+        width: '85%',
+        height: 100,
+        backgroundColor: 'grey',
+        // position: 'absolute',
+        // top: 80,
+        // zIndex: 10,
+        borderRadius: 10,
+    },
+    clickDate: {
         width: '100%',
         // backgroundColor: 'yellow',
         flexDirection: 'row',
@@ -559,7 +650,7 @@ const styles = StyleSheet.create({
 
 
     },
-    clickDateText : {
+    clickDateText: {
         marginLeft: 7,
         marginRight: 7,
         fontWeight: '500',

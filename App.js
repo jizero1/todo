@@ -100,9 +100,9 @@ const App = () => {
                         <View style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={{ fontSize: 14, fontWeight: '700', color: '#FFFFFF' }}>오늘</Text></View>
                     </View>
                     <View style={styles.calendarToday}>
-                        <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.calendarTodayLeft}><Icon name="chevron-left" size={22} color="black" marginTop="3"></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(-1)}><Icon name="chevron-left" size={22} color="black" marginTop="3"></Icon></TouchableOpacity>
                         <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
-                        <TouchableOpacity onPress={() => changeMonth(1)} style={styles.calendarTodayRight}><Icon name="chevron-right" size={22} color="black" marginTop="3"></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(1)}><Icon name="chevron-right" size={22} color="black" marginTop="3"></Icon></TouchableOpacity>
                     </View>
                 </View>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -141,63 +141,93 @@ const App = () => {
     }
 
     const [clickMood, setClickMood] = useState(false);
-    const [selectedMood, setSelectedMood] = useState(null);
+    // const [closeMood, setCloseMood] = useState(false);
     const mood = () => {
         setClickMood(!clickMood);
     }
-    const moodImages = [
-        require('./img/icons/icon.png'),
-        require('./img/icons/icon.png'),
-        require('./img/icons/icon.png'),
-        require('./img/icons/icon.png'),
-        require('./img/icons/icon.png'),
-    ]
-
-    // console.log(selectedMood);
-    const saveMood = async(mood) => {
-        try {
-            const moodKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
-            console.log("기분저장중~",mood);
-            await AsyncStorage.setItem(moodKey, JSON.stringify(mood));
-            console.log("기분저장성공", mood);
-        } catch(error) {
-            console.error("기분저장실패", error);
-        }
-    }
-    const loadMood = async() => {
-        try {
-            const moodKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
-            const storedMood = await AsyncStorage.getItem(moodKey);
-            if (storedMood !== null) {
-                setSelectedMood(JSON.parse(storedMood));
-                console.log("기분꺼내기 성공",storedMood);
-                
-            } 
-        } catch (error) {
-            console.error("기분꺼내기 실패", error);
-        }
-    }
-    useEffect(() => {
-        loadMood();
-    },[selectedDate]);
-
-    const handleMood = (mood) => {
-        setSelectedMood(mood);
-        saveMood(mood); // 저장소에 저장
+    const moodClose = () => {
         setClickMood(false);
     }
+
+    const moodImages = [
+        require('./img/icons/mood1.png'),
+        require('./img/icons/mood2.png'),
+        require('./img/icons/mood3.png'),
+        require('./img/icons/mood4.png'),
+        require('./img/icons/mood5.png'),
+    ]
+    const [selectedMood, setSelectedMood] = useState(null); // 기본 이미지로 초기화
+    const moodKey = `mood-${nowYear}-${nowMonth}-${selectedDate.getDate()}`;
+
+    const saveMood = async (img) => {
+
+        try {
+            // 선택된 날짜에 대해서만 저장
+            // const moodKey = `mood-${nowYear}-${nowMonth}-${selectedDate.getDate()}`;
+            console.log(moodKey);
+            await AsyncStorage.setItem(moodKey, JSON.stringify(img));
+            console.log("기분저장성공", img);
+        } catch (error) {
+            console.error("기분저장실패", error);
+        }
+
+    }
+
+    useEffect(() => {
+        const loadMood = async () => {
+
+            try {
+                // const moodKey = `mood-${nowYear}-${nowMonth}-${selectedDate.getDate()}`;
+                const storedMood = await AsyncStorage.getItem(moodKey);
+                if (storedMood !== null) {
+                    // console.log(moodKey);
+                    console.log("기분 불러오기 중", storedMood);
+                    setSelectedMood(JSON.parse(storedMood));
+                    console.log("기분 불러오기 성공", storedMood);
+                } else {
+                    console.log("저장된 기분 없음");
+                    setSelectedMood(null); // 저장된 값이 없다면 null
+                }
+            } catch (error) {
+                setTodoList([]);
+                console.error("기분 불러오기 실패", error);
+            }
+        }
+        loadMood();
+    }, [nowYear, nowMonth, selectedDate]);
+
+    const handleMood = (img) => {
+        setSelectedMood(img);
+        saveMood(img);
+        setClickMood(false);
+    }
+
+    const newDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), nowDate);
+    const day = newDate.getDay();
+    let dayText = "";
+    switch (day) {
+        case 0: dayText = "일"; break;
+        case 1: dayText = "월"; break;
+        case 2: dayText = "화"; break;
+        case 3: dayText = "수"; break;
+        case 4: dayText = "목"; break;
+        case 5: dayText = "금"; break;
+        case 6: dayText = "토"; break;
+    }
+
     // ------------------------ 현재 날짜 표시 & 할일 갯수 표시 ------------------------ //
     const TimeText = () => {
         return (
             <View style={styles.TimeTextContainer}>
                 <View style={styles.TodoBlockContainer}>
+
                     <TouchableOpacity onPress={mood} style={styles.TodoBlockDate}>
                         {selectedMood ? (
-                            <Image source={selectedMood}></Image>)
-                            : (<Text>+</Text>
-                        )}
+                            <Image source={selectedMood} style={styles.moodImg}></Image>)
+                            : (<Text style={{fontSize: 25, color: 'lightgrey'}}>+</Text>
+                            )}
 
-                        <Text style={{ fontWeight: '600' }}>{nowDate}일</Text>
+                        <Text style={{ fontWeight: '600', fontSize: 12 }}>{nowDate}일 ({dayText})</Text>
                     </TouchableOpacity>
 
                     <View style={styles.TodoBlock}>
@@ -212,11 +242,17 @@ const App = () => {
                 </View>
                 {clickMood && (
                     <View style={styles.moodContainer}>
+                        {/* <View style={{flexDirection:'row'}}> */}
+                        <Text style={styles.moodText}>오늘의 기분은 ?</Text>
+                        <TouchableOpacity style={styles.moodClose} onPress={moodClose}><Icon name="close" color="grey"></Icon></TouchableOpacity>
+                        {/* </View> */}
+                        <View style={styles.moodImages}>
                         {moodImages.map((img, index) => (
                             <TouchableOpacity key={index} onPress={() => handleMood(img)}>
                                 <Image source={img} style={styles.moodOption} />
                             </TouchableOpacity>
                         ))}
+                        </View>
                     </View>
                 )}
 
@@ -265,8 +301,14 @@ const App = () => {
         const [modal, setModal] = useState(false);
         const modalClick = () => {
             setModal(!modal);
-            setText('');
+                setText('');
         };
+        const modalBackgroundClick = (e) => {
+            if (e.target === e.currentTarget) {
+                setModal(!modal);
+                setText('');
+            }
+        }
 
         // input에 입력된 텍스트 저장
         const [text, setText] = useState('');
@@ -327,7 +369,7 @@ const App = () => {
                     visible={modal} // 모달을 보이게할지 여부
                     onRequestClose={modalClick} // 안드로이드에서 뒤로가기 버튼 누를때 모달 안보이게하기
                 >
-                    <View style={styles.modalBackground}>
+                    <View style={styles.modalBackground} onTouchStart={modalBackgroundClick  }>
                         <View style={styles.modalContainer}>
                             <View style={styles.modalRemove}>
                                 <TouchableWithoutFeedback onPress={modalClick}><Icon name="close" style={styles.modalRemoveIcon} ></Icon></TouchableWithoutFeedback>
@@ -485,13 +527,13 @@ const styles = StyleSheet.create({
     //     marginRight: 10,
     // },
     calendarToday: {
-        // flex: 1,
+        flex: 1,
         width: 140,
         height: 30,
         // backgroundColor: '#C4D1F5',
         // backgroundColor: '#F2ECE3',
         // marginLeft: 10,
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         flexDirection: 'row',
         // borderRadius: 10,
@@ -500,6 +542,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
         // color: 'white',
+        flexWrap: 'wrap',
         marginLeft: 5,
         marginRight: 5,
     },
@@ -559,7 +602,10 @@ const styles = StyleSheet.create({
         fontSize: 35,
         color: '#7B9AFC',
     },
-
+    moodImg: {
+        width: 45,
+        height: 45,
+    },
     TimeTextContainer: {
         width: '100%',
         justifyContent: 'center',
@@ -599,22 +645,22 @@ const styles = StyleSheet.create({
         marginTop: 30,
     },
     TodoBlockDate: {
-        width: 60,
-        height: 60,
+        width:80,
+        height: 70,
         backgroundColor: '#F7F6F6',
-        borderRadius: 30,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        marginLeft: 15,
-        marginRight: 10,
+        marginLeft: 10,
+        marginRight: 5,
         // position: 'absolute',
     },
     TodoBlock: {
-        width: 140,
+        width: 130,
         height: 70,
-        marginLeft: 10,
-        marginRight: 10,
+        marginLeft: 7,
+        marginRight: 7,
         backgroundColor: '#EFF4FC',  // 기본 색상
         justifyContent: 'center',
         alignItems: 'center',
@@ -629,13 +675,36 @@ const styles = StyleSheet.create({
         fontWeight: '800',
     },
     moodContainer: {
-        width: '85%',
+        width: '75%',
         height: 100,
-        backgroundColor: 'grey',
+        backgroundColor: '#F7F6F6',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
         // position: 'absolute',
         // top: 80,
         // zIndex: 10,
         borderRadius: 10,
+        position: 'relative',
+    },
+    moodClose: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+    },
+    moodText: {
+        fontSize: 13,
+        marginBottom: 5,
+    },
+    moodImages:{
+        // width: '100%',
+        // height: 50,
+        flexDirection: 'row',
+        // backgroundColor: 'white',
+    },
+    moodOption: {
+        width: 50,
+        height: 50,
     },
     clickDate: {
         width: '100%',
@@ -755,7 +824,7 @@ const styles = StyleSheet.create({
     },
     modalInput: {
         width: '90%',
-        height: 45,
+        height: 50,
         marginTop: 40,
         marginBottom: 30,
         borderBottomWidth: 2,

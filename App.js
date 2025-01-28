@@ -50,31 +50,53 @@ const App = () => {
         setSelectedDate(newDate); // 저장된 날짜를 selectedDate에 저장
     }, [selectedDate]);
 
-    // 날짜마다 데이터가 있으면 . 표시유무 지정
+    // // 날짜마다 데이터가 있으면 . 표시유무 지정
     const [a, setA] = useState({});
-    const getData = useCallback(async () => {
-        let updatedA = {};
-        for (let i = firstDate; i <= lastDate; i++) {
-            const allDays = `${nowYear}-${nowMonth}-${i}`;
-            const get = await AsyncStorage.getItem(allDays);
-            if (get && get !== "[]") {
-                // 데이터가 있으면 true
-                updatedA[allDays] = true;
-            } else {
-                // 데이터가 없으면 false
-                updatedA[allDays] = false;
-            }
-        }
-        setA(updatedA);
-        // 연도와 달이 바뀌면, 해당월의 첫날짜와 마지막날짜도 변경되기 때문에 그에 맞는
-        // 데이터를 업데이트 하려면 아래처럼 추가해야함.
-    }, [nowYear, nowMonth, firstDate, lastDate]);
+    // const getData = useCallback(async () => {
+    //     let updatedA = {};
+    //     for (let i = firstDate; i <= lastDate; i++) {
+    //         const allDays = `${nowYear}-${nowMonth}-${i}`;
+    //         const get = await AsyncStorage.getItem(allDays);
+    //         if (get && get !== "[]") {
+    //             // 데이터가 있으면 true
+    //             updatedA[allDays] = true;
+    //         } else {
+    //             // 데이터가 없으면 false
+    //             updatedA[allDays] = false;
+    //         }
+    //     }
+    //     setA(updatedA);
+    //     // 연도와 달이 바뀌면, 해당월의 첫날짜와 마지막날짜도 변경되기 때문에 그에 맞는
+    //     // 데이터를 업데이트 하려면 아래처럼 추가해야함.
+    // }, [nowYear, nowMonth, firstDate, lastDate]);
+
+    // useEffect(() => {
+    //     getData();
+    //     // 연도, 월이 바뀌면 그에 맞는 데이터로 업데이트한다.
+    // }, [getData, selectedDate]);
 
     useEffect(() => {
+        const getData = async () => {
+            let updatedA = {};
+            try {
+                for (let i = firstDate; i <= lastDate; i++) {
+                    const allDays = `${nowYear}-${nowMonth}-${i}`;
+                    const get = await AsyncStorage.getItem(allDays);
+                    // console.log(get);
+                    if (get !== null && get && get !== "[]") {
+                        updatedA[allDays] = true;
+                    } else {
+                        updatedA[allDays] = false;
+                    }
+                }
+                // console.log("ddd"+todoList);
+                setA(updatedA);
+            } catch (error) {
+                console.log("데이터 불러오기 실패");
+            }
+        }
         getData();
-        // 연도, 월이 바뀌면 그에 맞는 데이터로 업데이트한다.
-    }, [getData, selectedDate]);
-
+    }, [nowYear,nowMonth,firstDate,lastDate,selectedDate]);
     // 클릭한 날짜 저장 (클릭한 날짜에 테두리 지정하기 위함)
     const [click, setClick] = useState({});
     const dateClick = (day) => {
@@ -100,9 +122,9 @@ const App = () => {
                         <View style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={{ fontSize: 14, fontWeight: '700', color: '#FFFFFF' }}>오늘</Text></View>
                     </View>
                     <View style={styles.calendarToday}>
-                        <TouchableOpacity onPress={() => changeMonth(-1)}><Icon name="chevron-left" size={22} color="black" marginTop="3"></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(-1)}><Icon name="chevron-left" size={25} color="black"></Icon></TouchableOpacity>
                         <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
-                        <TouchableOpacity onPress={() => changeMonth(1)}><Icon name="chevron-right" size={22} color="black" marginTop="3"></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(1)}><Icon name="chevron-right" size={25} color="black"></Icon></TouchableOpacity>
                     </View>
                 </View>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -224,7 +246,7 @@ const App = () => {
                     <TouchableOpacity onPress={mood} style={styles.TodoBlockDate}>
                         {selectedMood ? (
                             <Image source={selectedMood} style={styles.moodImg}></Image>)
-                            : (<Text style={{fontSize: 25, color: 'lightgrey'}}>+</Text>
+                            : (<Text style={{ fontSize: 25, color: 'lightgrey' }}>+</Text>
                             )}
 
                         <Text style={{ fontWeight: '600', fontSize: 12 }}>{nowDate}일 ({dayText})</Text>
@@ -247,11 +269,11 @@ const App = () => {
                         <TouchableOpacity style={styles.moodClose} onPress={moodClose}><Icon name="close" color="grey"></Icon></TouchableOpacity>
                         {/* </View> */}
                         <View style={styles.moodImages}>
-                        {moodImages.map((img, index) => (
-                            <TouchableOpacity key={index} onPress={() => handleMood(img)}>
-                                <Image source={img} style={styles.moodOption} />
-                            </TouchableOpacity>
-                        ))}
+                            {moodImages.map((img, index) => (
+                                <TouchableOpacity key={index} onPress={() => handleMood(img)}>
+                                    <Image source={img} style={styles.moodOption} />
+                                </TouchableOpacity>
+                            ))}
                         </View>
                     </View>
                 )}
@@ -301,7 +323,7 @@ const App = () => {
         const [modal, setModal] = useState(false);
         const modalClick = () => {
             setModal(!modal);
-                setText('');
+            setText('');
         };
         const modalBackgroundClick = (e) => {
             if (e.target === e.currentTarget) {
@@ -369,7 +391,7 @@ const App = () => {
                     visible={modal} // 모달을 보이게할지 여부
                     onRequestClose={modalClick} // 안드로이드에서 뒤로가기 버튼 누를때 모달 안보이게하기
                 >
-                    <View style={styles.modalBackground} onTouchStart={modalBackgroundClick  }>
+                    <View style={styles.modalBackground} onTouchStart={modalBackgroundClick}>
                         <View style={styles.modalContainer}>
                             <View style={styles.modalRemove}>
                                 <TouchableWithoutFeedback onPress={modalClick}><Icon name="close" style={styles.modalRemoveIcon} ></Icon></TouchableWithoutFeedback>
@@ -496,36 +518,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 20,
         paddingRight: 20,
-        paddingTop: 30,
+        paddingTop: 25,
         // marginTop: 15,
         // marginBottom: 15,
     },
-    calendarTodayImg: {
-        // justifyContent: 'flex-start',
-    },
-    calendarTodayLeftRightContainer: {
-        //    backgroundColor: 'yellow',
-        //    margin-
-    },
-    // calendarTodayLeft: {
-    //     width: 30,
-    //     height: 30,
-    //     backgroundColor: '#C4D1F5',
-    //     alignItems: 'center',
-    //     justifyContent: 'center',
-    //     marginLeft: 10,
-    //     marginRight: 10,
-    //     borderRadius: 10,
-    // },
-    // calendarTodayRight: {
-    //     width: 30,
-    //     height: 30,
-    //     backgroundColor: '#C4D1F5',
-    //     alignItems: 'center',
-    //     justifyContent: 'center',
-    //     borderRadius: 10,
-    //     marginRight: 10,
-    // },
     calendarToday: {
         flex: 1,
         width: 140,
@@ -539,9 +535,12 @@ const styles = StyleSheet.create({
         // borderRadius: 10,
     },
     calendarTodayText: {
-        fontSize: 14,
-        fontWeight: '500',
+        fontSize: 16,
+        // fontWeight: '500',
         // color: 'white',
+        // justifyContent: 'center',
+        // alignItems: 'center',
+        // textAlign: 'center',
         flexWrap: 'wrap',
         marginLeft: 5,
         marginRight: 5,
@@ -573,32 +572,36 @@ const styles = StyleSheet.create({
     },
     calendarDate: {
         width: 50,
-        height: 60,
+        height: 66,
         borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 10,
         marginRight: 10,
+        // marginTop: 5,
         position: 'relative',
         // backgroundColor: '#F7F6F4',
     },
     calendarDayText: {
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: '600',
-        paddingTop: 5,
+        marginTop: 5,
+        // marginBottom: 5, 
+        // paddingTop: 5,
         color: '#D1D1D1',
         position: 'absolute',
         top: 0,
     },
     calendarDateText: {
+        // fontSize: 15,
         color: 'black',
         position: 'absolute',
         // fontSize: 15,
-        top: 23,
+        top: 28,
     },
     calendarDot: {
         position: 'absolute',
-        top: 12,
+        top: 18,
         fontSize: 35,
         color: '#7B9AFC',
     },
@@ -621,8 +624,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     nowDay: {
-        width: 40,
-        height: 23,
+        // flex: 1,
+        width: 50,
+        height: 24,
         backgroundColor: '#FF987F',
         justifyContent: 'center',
         alignItems: 'center',
@@ -645,7 +649,7 @@ const styles = StyleSheet.create({
         marginTop: 30,
     },
     TodoBlockDate: {
-        width:80,
+        width: 80,
         height: 70,
         backgroundColor: '#F7F6F6',
         borderRadius: 10,
@@ -657,8 +661,9 @@ const styles = StyleSheet.create({
         // position: 'absolute',
     },
     TodoBlock: {
-        width: 130,
-        height: 70,
+        // flex: 1,
+        width: 120,
+        height: 67,
         marginLeft: 7,
         marginRight: 7,
         backgroundColor: '#EFF4FC',  // 기본 색상
@@ -696,7 +701,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
         marginBottom: 5,
     },
-    moodImages:{
+    moodImages: {
         // width: '100%',
         // height: 50,
         flexDirection: 'row',
@@ -734,7 +739,7 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '93%',
         height: '100%',
-        paddingTop: 10,
+        paddingTop: 5,
         // backgroundColor: 'lightgrey',
         // borderWidth: 3,
         // borderColor: 'green',
@@ -780,12 +785,12 @@ const styles = StyleSheet.create({
     },
     ToDoRemoveBtn: {
         textAlign: 'center',
-        marginRight: 20,
+        marginRight: 10,
     },
     color: {
-        width: 4.5,
+        width: 5,
         height: 35,
-        marginLeft: 15,
+        marginLeft: 5,
         marginRight: 0,
         borderRadius: 3,
     },
@@ -829,6 +834,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         borderBottomWidth: 2,
         borderColor: '#CFCFCF',
+        fontSize: 14,
     },
     modalRemove: {
         alignItems: 'flex-end',
@@ -850,11 +856,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     checkColor: {
-        width: 35,
-        height: 35,
+        width: 40,
+        height: 40,
         borderRadius: '100%',
-        marginLeft: 10,
-        marginRight: 10,
+        marginLeft: 8,
+        marginRight: 8,
         marginBottom: 45,
         justifyContent: 'center',
         alignItems: 'center',

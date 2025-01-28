@@ -52,28 +52,6 @@ const App = () => {
 
     // // 날짜마다 데이터가 있으면 . 표시유무 지정
     const [a, setA] = useState({});
-    // const getData = useCallback(async () => {
-    //     let updatedA = {};
-    //     for (let i = firstDate; i <= lastDate; i++) {
-    //         const allDays = `${nowYear}-${nowMonth}-${i}`;
-    //         const get = await AsyncStorage.getItem(allDays);
-    //         if (get && get !== "[]") {
-    //             // 데이터가 있으면 true
-    //             updatedA[allDays] = true;
-    //         } else {
-    //             // 데이터가 없으면 false
-    //             updatedA[allDays] = false;
-    //         }
-    //     }
-    //     setA(updatedA);
-    //     // 연도와 달이 바뀌면, 해당월의 첫날짜와 마지막날짜도 변경되기 때문에 그에 맞는
-    //     // 데이터를 업데이트 하려면 아래처럼 추가해야함.
-    // }, [nowYear, nowMonth, firstDate, lastDate]);
-
-    // useEffect(() => {
-    //     getData();
-    //     // 연도, 월이 바뀌면 그에 맞는 데이터로 업데이트한다.
-    // }, [getData, selectedDate]);
 
     useEffect(() => {
         const getData = async () => {
@@ -82,14 +60,12 @@ const App = () => {
                 for (let i = firstDate; i <= lastDate; i++) {
                     const allDays = `${nowYear}-${nowMonth}-${i}`;
                     const get = await AsyncStorage.getItem(allDays);
-                    // console.log(get);
                     if (get !== null && get && get !== "[]") {
                         updatedA[allDays] = true;
                     } else {
                         updatedA[allDays] = false;
                     }
                 }
-                // console.log("ddd"+todoList);
                 setA(updatedA);
             } catch (error) {
                 console.log("데이터 불러오기 실패");
@@ -97,6 +73,8 @@ const App = () => {
         }
         getData();
     }, [nowYear,nowMonth,firstDate,lastDate,selectedDate]);
+
+    
     // 클릭한 날짜 저장 (클릭한 날짜에 테두리 지정하기 위함)
     const [click, setClick] = useState({});
     const dateClick = (day) => {
@@ -404,6 +382,7 @@ const App = () => {
                                 style={styles.modalInput}
                                 selectionColor="#CFCFCF"
                             ></TextInput>
+                    
                             <View style={styles.checkColorContainer}>
                                 {colorOptions.map((option) => (
                                     <TouchableOpacity key={option.id} onPress={() => changeColor(option.color)}
@@ -675,9 +654,9 @@ const styles = StyleSheet.create({
         fontSize: 13,
     },
     TodoBlockCount: {
-        fontSize: 20,
+        fontSize: 18,
         marginBottom: 5,
-        fontWeight: '800',
+        fontWeight: '500',
     },
     moodContainer: {
         width: '75%',

@@ -1,83 +1,51 @@
-<<<<<<< HEAD
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+## 프로젝트명 [ 하루토마토🍅 ]
 
-# Getting Started
+## 프로젝트 설명
+하루토마토는 사용자가 날짜별로 할 일을 기록/관리하는 간단한 To Do List 앱 입니다. 
+평범한 체크표시 아이콘대신, 토마토 아이콘을 이용하여 할 일을 체크할 수 있고, 
+5가지 색상과 표정의 토마토 아이콘으로 기분을 표시하고 기록 할 수 있어서
+하루의 감정과 일정을 간편하게 확인 할 수 있습니다. 
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## 프로젝트 링크
+( 아직 앱 출시 전이라 링크는 없음 )
 
-## Step 1: Start the Metro Server
+## 개발자
+최지영
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## 개발기간
+2025.01.09 ~ 2025.01.28
 
-To start Metro, run the following command from the _root_ of your React Native project:
+## 주요 기능
+### 1. 할일 추가
+할일 추가버튼을 눌러 해당 날짜에 할 일을 추가할 수 있습니다.
+할 일을 완료한 후에는 토마토 아이콘(체크버튼)을 눌러 완료 상태를 표시할 수 있고,
+삭제 아이콘을 눌러 할 일을 삭제할 수 있습니다.
 
-```bash
-# using npm
-npm start
+### 2. 날짜별 할일 관리
+가로스크롤이 되는 달력을 통해 날짜별로 할 일을 관리할 수 있습니다. 
+할 일 데이터가 있는 날짜에는 . 표시를 하여 사용자에게 해당 날짜에 할 일이 있음을 직관적으로 알립니다.
 
-# OR using Yarn
-yarn start
-```
+### 3. 기분 표시
+5가지의 토마토 아이콘(토마토에 표정이 그려져있음)을 통해 사용자는 날짜별로
+자신의 기분을 표현 할 수 있습니다. 
 
-## Step 2: Start your Application
+### 4. AsyncStorage
+AsyncStorage에 날짜별로 할 일과 기분을 저장하여 앱에 반영구적으로 데이터를 저장합니다.
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+## 기술 스택
+React Native : 앱의 UI를 구성하는데에 사용
+AsyncStorage : 데이터를 로컬에 저장하여 날짜별로 할 일 및 기분을 관리
 
-### For Android
+## 추가하고 싶은 기능
+1. 메모기능
 
-```bash
-# using npm
-npm run android
 
-# OR using Yarn
-yarn android
-```
+## 수정하고싶은 사항
+1. 메인 화면 상단의 앱 아이콘 옆에 글자 추가할지 말지 고민중
 
-### For iOS
 
-```bash
-# using npm
-npm run ios
 
-# OR using Yarn
-yarn ios
-```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
 =======
 # todo
 >>>>>>> de2767f1e4bfa0242e6bd2fbca641e963bd02e2e

@@ -86,8 +86,8 @@ android {
         applicationId "com.jizerotodo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 12
-        versionName "1.1.0"
+        versionCode 13
+        versionName "1.1.1"
         buildConfigField "boolean", "IS_HERMES_ENABLED", "false"
     }
 compileOptions {
@@ -145,4 +145,11 @@ dependencies {
     apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
     implementation project(':react-native-vector-icons')
 
+}
+
+afterEvaluate {
+    def fontCopyTask = tasks.findByName("copyReactNativeVectorIconFonts")
+    def lintReportTask = tasks.findByName("generateDebugLintReportModel")
+
+    lintReportTask?.dependsOn(fontCopyTask)
 }

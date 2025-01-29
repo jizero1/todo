@@ -7,11 +7,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const App = () => {
 
     // 선택된 날짜 저장
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    // const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(new Date(new Date().setDate(1))); // 월의 1일로 초기화
+    console.log("초기월"+selectedDate);
 
     const date = new Date();
     const year = date.getFullYear();
-    const month = date.getMonth() + 1;
+    const month = date.getMonth();
     const dateDay = date.getDate();
     const nowMonth = selectedDate.getMonth() + 1;
     const nowYear = selectedDate.getFullYear();
@@ -36,12 +38,24 @@ const App = () => {
         return daysArray;
     }, [selectedDate]);
 
+
     // 월 변경 함수 ( < > 누르면 direction값에 따라 월 변경 )
     const changeMonth = useCallback((direction) => {
         const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
         newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
         setSelectedDate(newDate); // 변경된 월을 selectedDate에 저장
+        console.log("selectedDate",selectedDate);
+        console.log("현재월"+newDate.getMonth());
     }, [selectedDate]);
+
+    // const changeMonth = useCallback((direction) => {
+    //     // selectedDate를 직접 사용하지 않고, 최신 selectedDate를 가져오기 위해
+    //     setSelectedDate(prevDate => {
+    //         const newDate = new Date(prevDate); // 최신 상태의 selectedDate를 반영
+    //         newDate.setMonth(newDate.getMonth() + direction); // 월을 변경
+    //         return newDate;
+    //     });
+    // }, []);
 
     // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
     const handleDateClick = useCallback((day) => {
@@ -74,7 +88,7 @@ const App = () => {
             }
         }
         getData();
-    }, [nowYear, nowMonth, firstDate, lastDate]);
+    }, [nowYear, nowMonth, firstDate, lastDate, selectedDate]);
 
 
     // 날짜 클릭 시, 해당 날짜의 점 표시 유무 반영

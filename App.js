@@ -74,9 +74,23 @@ const App = () => {
             }
         }
         getData();
-    }, [nowYear,nowMonth,firstDate,lastDate,selectedDate]);
+    }, [nowYear,nowMonth,firstDate,lastDate]);
 
     
+    // 날짜 클릭 시, 해당 날짜의 점 표시 유무 반영
+const handleDateDot = useCallback((day) => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(day);
+    setSelectedDate(newDate);
+
+    // 데이터가 있으면 점 표시
+    const dayKey = `${nowYear}-${nowMonth}-${day}`;
+    console.log("ddd"+dayKey);
+    if (a[dayKey] === true) {
+        console.log(`데이터가 들어있는 날짜 ${dayKey}`);
+    }
+}, [selectedDate, a, nowYear, nowMonth]);
+
     // 클릭한 날짜 저장 (클릭한 날짜에 테두리 지정하기 위함)
     const [click, setClick] = useState({});
     const dateClick = (day) => {
@@ -125,7 +139,7 @@ const App = () => {
 
                             const dayKey = `${nowYear}-${nowMonth}-${day}`;
                             return (
-                                <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); }}>
+                                <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); handleDateDot(day); }}>
                                     <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }, click[day] ? { borderWidth: 3, borderColor: '#B6BCD2' } : { borderWidth: 3, borderColor: '#FFFFFF' }]}>
                                         <Text style={[styles.calendarDayText, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#898989' }]}>{dayText}</Text>
 

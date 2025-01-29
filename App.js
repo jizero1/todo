@@ -139,7 +139,7 @@ const App = () => {
 
                             const dayKey = `${nowYear}-${nowMonth}-${day}`;
                             return (
-                                <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); handleDateDot(day); }}>
+                                <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); handleDateDot(day); moodClose(); }}>
                                     <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }, click[day] ? { borderWidth: 3, borderColor: '#B6BCD2' } : { borderWidth: 3, borderColor: '#FFFFFF' }]}>
                                         <Text style={[styles.calendarDayText, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#898989' }]}>{dayText}</Text>
 
@@ -706,23 +706,16 @@ const styles = StyleSheet.create({
         fontSize: 13,
         marginBottom: 5,
         zIndex: 1,
-        // justifyContent:'center',
-        // alignItems: 'center',
     },
     moodTextLine: {
-        width: 200,
+        width: 230,
         height: 15,
-        backgroundColor: '#DBDBDB',
+        backgroundColor: '#E6E6E6',
         position: 'absolute',
         zIndex: 0,
-        // justifyContent:'center',
-        // alignItems: 'center',
     },
     moodImages: {
-        // width: '100%',
-        // height: 50,
         flexDirection: 'row',
-        // backgroundColor: 'white',
     },
     moodOption: {
         width: 50,

@@ -48,15 +48,6 @@ const App = () => {
         console.log("현재월"+newDate.getMonth());
     }, [selectedDate]);
 
-    // const changeMonth = useCallback((direction) => {
-    //     // selectedDate를 직접 사용하지 않고, 최신 selectedDate를 가져오기 위해
-    //     setSelectedDate(prevDate => {
-    //         const newDate = new Date(prevDate); // 최신 상태의 selectedDate를 반영
-    //         newDate.setMonth(newDate.getMonth() + direction); // 월을 변경
-    //         return newDate;
-    //     });
-    // }, []);
-
     // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
     const handleDateClick = useCallback((day) => {
         const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성
@@ -151,14 +142,6 @@ const App = () => {
                                 case 6: dayText = "토"; break;
                             }
 
-                            // const [weekColor, setWeekColor] = useState(false);
-                            // const weekColor = () => {
-                            //     if (dayOfWeek === 0 || dayOfWeek === 6){
-                            //         console.log("주말"+dayOfWeek);
-                            //     }
-                            // }
-                            
-                            
 
                             const dayKey = `${nowYear}-${nowMonth}-${day}`;
                             return (
@@ -166,7 +149,7 @@ const App = () => {
                                     <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }, click[day] ? { borderWidth: 3, borderColor: '#B6BCD2' } : { borderWidth: 3, borderColor: '#FFFFFF' }]}>
                                         <Text style={[styles.calendarDayText, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#898989' }]}>{dayText}</Text>
 
-                                        <Text style={[styles.calendarDateText, dayOfWeek === 0 || dayOfWeek === 6 ? {color:'red'} : {color:'black'}]}>{day}</Text>
+                                        <Text style={[styles.calendarDateText, dayOfWeek === 0 ? {color:'red'} : {color:'black'}]}>{day}</Text>
 
                                         <Text style={[styles.calendarDot, a[dayKey] ? { display: 'block' } : { display: 'none' }]}>.</Text>
                                     </View>

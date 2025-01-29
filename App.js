@@ -11,9 +11,10 @@ const App = () => {
 
     const date = new Date();
     const year = date.getFullYear();
-    const month = date.getMonth();
+    const month = date.getMonth()+1;
     const dateDay = date.getDate();
-    const nowMonth = selectedDate.getMonth() + 1;
+    const setMonth = selectedDate.getMonth()+1;
+    const nowMonth = selectedDate.getMonth();
     const nowYear = selectedDate.getFullYear();
     const nowDate = selectedDate.getDate();
 
@@ -101,7 +102,7 @@ const App = () => {
                     </View>
                     <View style={styles.calendarToday}>
                         <TouchableOpacity onPress={() => changeMonth(-1)}><Icon name="chevron-left" size={25} color="black"></Icon></TouchableOpacity>
-                        <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
+                        <Text style={styles.calendarTodayText}>{nowYear}년 {setMonth}월 </Text>
                         <TouchableOpacity onPress={() => changeMonth(1)}><Icon name="chevron-right" size={25} color="black"></Icon></TouchableOpacity>
                     </View>
                 </View>

@@ -137,13 +137,22 @@ const App = () => {
                                 case 6: dayText = "토"; break;
                             }
 
+                            // const [weekColor, setWeekColor] = useState(false);
+                            // const weekColor = () => {
+                            //     if (dayOfWeek === 0 || dayOfWeek === 6){
+                            //         console.log("주말"+dayOfWeek);
+                            //     }
+                            // }
+                            
+                            
+
                             const dayKey = `${nowYear}-${nowMonth}-${day}`;
                             return (
                                 <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); handleDateDot(day); moodClose(); }}>
                                     <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }, click[day] ? { borderWidth: 3, borderColor: '#B6BCD2' } : { borderWidth: 3, borderColor: '#FFFFFF' }]}>
                                         <Text style={[styles.calendarDayText, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#898989' }]}>{dayText}</Text>
 
-                                        <Text style={styles.calendarDateText}>{day}</Text>
+                                        <Text style={[styles.calendarDateText, dayOfWeek === 0 || dayOfWeek === 6 ? {color:'red'} : {color:'black'}]}>{day}</Text>
 
                                         <Text style={[styles.calendarDot, a[dayKey] ? { display: 'block' } : { display: 'none' }]}>.</Text>
                                     </View>

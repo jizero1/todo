@@ -13,8 +13,7 @@ const App = () => {
     const year = date.getFullYear();
     const month = date.getMonth()+1;
     const dateDay = date.getDate();
-    const setMonth = selectedDate.getMonth()+1;
-    const nowMonth = selectedDate.getMonth();
+    const nowMonth = selectedDate.getMonth()+1;
     const nowYear = selectedDate.getFullYear();
     const nowDate = selectedDate.getDate();
 
@@ -24,7 +23,7 @@ const App = () => {
         selectedDate.getFullYear() === new Date().getFullYear());
 
     const firstDay = new Date(nowYear, nowMonth, 1); // 해당 월의 1일 객체를 반환
-    const lastDay = new Date(nowYear, nowMonth + 1, 0); // 해당 월의 마지막날 객체를 반환
+    const lastDay = new Date(nowYear, nowMonth, 0); // 해당 월의 마지막날 객체를 반환
     const firstDate = firstDay.getDate(); // 1 이라는 날짜값만 반환
     const lastDate = lastDay.getDate(); // 마지막 날짜값만 반환
 
@@ -63,11 +62,13 @@ const App = () => {
                     const get = await AsyncStorage.getItem(allDays);
                     if (get !== null && get && get !== "[]") {
                         updatedA[allDays] = true;
+                        console.log(allDays);
                     } else {
                         updatedA[allDays] = false;
                     }
                 }
                 setA(updatedA);
+                console.log("데이터 불러오기 성공");
             } catch (error) {
                 console.log("데이터 불러오기 실패");
             }
@@ -102,7 +103,7 @@ const App = () => {
                     </View>
                     <View style={styles.calendarToday}>
                         <TouchableOpacity onPress={() => changeMonth(-1)}><Icon name="chevron-left" size={25} color="black"></Icon></TouchableOpacity>
-                        <Text style={styles.calendarTodayText}>{nowYear}년 {setMonth}월 </Text>
+                        <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
                         <TouchableOpacity onPress={() => changeMonth(1)}><Icon name="chevron-right" size={25} color="black"></Icon></TouchableOpacity>
                     </View>
                 </View>
@@ -222,7 +223,7 @@ const App = () => {
             <View style={styles.TimeTextContainer}>
                 <View style={styles.TodoBlockContainer}>
 
-                    <TouchableOpacity onPress={mood} style={styles.TodoBlockDate}>
+                    <TouchableOpacity onPress={mood} style={[styles.TodoBlockDate, selectedMood ? {justifyContent: ''} : {justifyContent: 'center'}]}>
                         {selectedMood ? (
                             <Image source={selectedMood} style={styles.moodImg}></Image>)
                             : (<Text style={{ fontSize: 25, color: 'lightgrey' }}>+</Text>
@@ -457,7 +458,12 @@ const App = () => {
     }, [todoList, selectedDate]);
 
     // 체크버튼 눌리면, 할일 갯수 변경 ( todoList의 값이 변경될때마다 실행 )
-    const todoListCount = todoList.length;
+    const [todoListCount, setTodoListCount] = useState(0);
+    useEffect(() => {
+        const clearCheck = todoList.length - todoList.filter(todo => todo.checked).length;
+        setTodoListCount(clearCheck);
+    }, [todoList]);
+
     const [todoListCountCheck, setTodoListCountCheck] = useState(0);
     useEffect(() => {
         setTodoListCountCheck(todoList.filter(todo => todo.checked).length);
@@ -621,19 +627,20 @@ const styles = StyleSheet.create({
     },
     TodoBlockContainer: {
         width: '100%',
-        height: 30,
+        height: 70,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 40,
-        marginTop: 30,
+        marginTop: 10,
+        // backgroundColor: 'grey',
     },
     TodoBlockDate: {
-        width: 80,
-        height: 70,
+        width: 70,
+        height: 67,
         backgroundColor: '#F7F6F6',
         borderRadius: 10,
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
         marginLeft: 10,
@@ -642,8 +649,9 @@ const styles = StyleSheet.create({
     },
     TodoBlock: {
         // flex: 1,
-        width: 120,
-        height: 67,
+        // width: 120,
+        width: '30%',
+        height: 65,
         marginLeft: 7,
         marginRight: 7,
         backgroundColor: '#EFF4FC',  // 기본 색상
@@ -657,7 +665,7 @@ const styles = StyleSheet.create({
     TodoBlockCount: {
         fontSize: 18,
         marginBottom: 5,
-        fontWeight: '500',
+        fontWeight: '600',
     },
     moodContainer: {
         width: '75%',

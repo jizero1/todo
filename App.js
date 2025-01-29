@@ -11,9 +11,9 @@ const App = () => {
 
     const date = new Date();
     const year = date.getFullYear();
-    const month = date.getMonth()+1;
+    const month = date.getMonth() + 1;
     const dateDay = date.getDate();
-    const nowMonth = selectedDate.getMonth()+1;
+    const nowMonth = selectedDate.getMonth() + 1;
     const nowYear = selectedDate.getFullYear();
     const nowDate = selectedDate.getDate();
 
@@ -74,22 +74,22 @@ const App = () => {
             }
         }
         getData();
-    }, [nowYear,nowMonth,firstDate,lastDate]);
+    }, [nowYear, nowMonth, firstDate, lastDate]);
 
-    
+
     // 날짜 클릭 시, 해당 날짜의 점 표시 유무 반영
-const handleDateDot = useCallback((day) => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(day);
-    setSelectedDate(newDate);
+    const handleDateDot = useCallback((day) => {
+        const newDate = new Date(selectedDate);
+        newDate.setDate(day);
+        setSelectedDate(newDate);
 
-    // 데이터가 있으면 점 표시
-    const dayKey = `${nowYear}-${nowMonth}-${day}`;
-    console.log("ddd"+dayKey);
-    if (a[dayKey] === true) {
-        console.log(`데이터가 들어있는 날짜 ${dayKey}`);
-    }
-}, [selectedDate, a, nowYear, nowMonth]);
+        // 데이터가 있으면 점 표시
+        const dayKey = `${nowYear}-${nowMonth}-${day}`;
+        console.log("ddd" + dayKey);
+        if (a[dayKey] === true) {
+            console.log(`데이터가 들어있는 날짜 ${dayKey}`);
+        }
+    }, [selectedDate, a, nowYear, nowMonth]);
 
     // 클릭한 날짜 저장 (클릭한 날짜에 테두리 지정하기 위함)
     const [click, setClick] = useState({});
@@ -116,9 +116,9 @@ const handleDateDot = useCallback((day) => {
                         <View style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={{ fontSize: 14, fontWeight: '700', color: '#FFFFFF' }}>오늘</Text></View>
                     </View>
                     <View style={styles.calendarToday}>
-                        <TouchableOpacity onPress={() => changeMonth(-1)}><Icon name="chevron-left" size={25} color="black"></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(-1)}><Icon name="chevron-left" size={23} color="#6D6D6D"></Icon></TouchableOpacity>
                         <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
-                        <TouchableOpacity onPress={() => changeMonth(1)}><Icon name="chevron-right" size={25} color="black"></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(1)}><Icon name="chevron-right" size={23} color="#6D6D6D"></Icon></TouchableOpacity>
                     </View>
                 </View>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -237,7 +237,7 @@ const handleDateDot = useCallback((day) => {
             <View style={styles.TimeTextContainer}>
                 <View style={styles.TodoBlockContainer}>
 
-                    <TouchableOpacity onPress={mood} style={[styles.TodoBlockDate, selectedMood ? {justifyContent: ''} : {justifyContent: 'center'}]}>
+                    <TouchableOpacity onPress={mood} style={[styles.TodoBlockDate, selectedMood ? { justifyContent: '' } : { justifyContent: 'center' }]}>
                         {selectedMood ? (
                             <Image source={selectedMood} style={styles.moodImg}></Image>)
                             : (<Text style={{ fontSize: 25, color: 'lightgrey' }}>+</Text>
@@ -259,7 +259,10 @@ const handleDateDot = useCallback((day) => {
                 {clickMood && (
                     <View style={styles.moodContainer}>
                         {/* <View style={{flexDirection:'row'}}> */}
-                        <Text style={styles.moodText}>오늘의 기분은 ?</Text>
+                        <View style={styles.moodTextContainer}>
+                            <Text style={styles.moodText}>오늘의 기분을 선택 해보세요!</Text>
+                            <View style={styles.moodTextLine}></View>
+                        </View>
                         <TouchableOpacity style={styles.moodClose} onPress={moodClose}><Icon name="close" color="grey"></Icon></TouchableOpacity>
                         {/* </View> */}
                         <View style={styles.moodImages}>
@@ -398,7 +401,7 @@ const handleDateDot = useCallback((day) => {
                                 style={styles.modalInput}
                                 selectionColor="#CFCFCF"
                             ></TextInput>
-                    
+
                             <View style={styles.checkColorContainer}>
                                 {colorOptions.map((option) => (
                                     <TouchableOpacity key={option.id} onPress={() => changeColor(option.color)}
@@ -511,32 +514,24 @@ const styles = StyleSheet.create({
 
     calendarTodayContainer: {
         width: '100%',
-        // height: 45,
         flexDirection: 'row',
-        // backgroundColor: 'blue',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingLeft: 20,
         paddingRight: 20,
-        paddingTop: 25,
-        // marginTop: 15,
-        // marginBottom: 15,
+        paddingTop: 20,
     },
     calendarToday: {
         flex: 1,
         width: 140,
         height: 30,
-        // backgroundColor: '#C4D1F5',
-        // backgroundColor: '#F2ECE3',
-        // marginLeft: 10,
         justifyContent: 'flex-end',
         alignItems: 'center',
         flexDirection: 'row',
-        // borderRadius: 10,
     },
     calendarTodayText: {
-        fontSize: 16,
-        // fontWeight: '500',
+        fontSize: 15,
+        fontWeight: '500',
         // color: 'white',
         // justifyContent: 'center',
         // alignItems: 'center',
@@ -699,9 +694,29 @@ const styles = StyleSheet.create({
         top: 10,
         right: 10,
     },
+    moodTextContainer : {
+        width: '90%',
+        height: 30,
+        // backgroundColor: 'white',
+        justifyContent:'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
     moodText: {
         fontSize: 13,
         marginBottom: 5,
+        zIndex: 1,
+        // justifyContent:'center',
+        // alignItems: 'center',
+    },
+    moodTextLine: {
+        width: 200,
+        height: 15,
+        backgroundColor: '#DBDBDB',
+        position: 'absolute',
+        zIndex: 0,
+        // justifyContent:'center',
+        // alignItems: 'center',
     },
     moodImages: {
         // width: '100%',
@@ -831,7 +846,7 @@ const styles = StyleSheet.create({
     },
     modalInput: {
         width: '90%',
-        height: 50,
+        height: 40,
         marginTop: 40,
         marginBottom: 30,
         borderBottomWidth: 2,

@@ -121,9 +121,9 @@ const App = () => {
                         <View style={[styles.nowDay, isToday ? { display: 'flex' } : { display: 'none' }]}><Text style={{ fontSize: 14, fontWeight: '700', color: '#FFFFFF' }}>오늘</Text></View>
                     </View>
                     <View style={styles.calendarToday}>
-                        <TouchableOpacity onPress={() => changeMonth(-1)}><Icon name="chevron-left" size={23} color="#6D6D6D"></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(-1)}><Icon name="chevron-left" size={23} color="#979797"></Icon></TouchableOpacity>
                         <Text style={styles.calendarTodayText}>{nowYear}년 {nowMonth}월 </Text>
-                        <TouchableOpacity onPress={() => changeMonth(1)}><Icon name="chevron-right" size={23} color="#6D6D6D"></Icon></TouchableOpacity>
+                        <TouchableOpacity onPress={() => changeMonth(1)}><Icon name="chevron-right" size={23} color="#979797"></Icon></TouchableOpacity>
                     </View>
                 </View>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -264,13 +264,8 @@ const App = () => {
                 </View>
                 {clickMood && (
                     <View style={styles.moodContainer}>
-                        {/* <View style={{flexDirection:'row'}}> */}
-                        <View style={styles.moodTextContainer}>
                             <Text style={styles.moodText}>오늘의 기분을 선택 해보세요!</Text>
-                            <View style={styles.moodTextLine}></View>
-                        </View>
                         <TouchableOpacity style={styles.moodClose} onPress={moodClose}><Icon name="close" color="grey"></Icon></TouchableOpacity>
-                        {/* </View> */}
                         <View style={styles.moodImages}>
                             {moodImages.map((img, index) => (
                                 <TouchableOpacity key={index} onPress={() => handleMood(img)}>
@@ -611,7 +606,7 @@ const styles = StyleSheet.create({
     },
     nowDay: {
         width: 50,
-        height: 24,
+        height: 27,
         backgroundColor: '#FF987F',
         justifyContent: 'center',
         alignItems: 'center',
@@ -634,8 +629,8 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     TodoBlockDate: {
-        width: 70,
-        height: 67,
+        width: 75,
+        height: '100%',
         backgroundColor: '#F7F6F6',
         borderRadius: 10,
         alignItems: 'center',
@@ -645,7 +640,7 @@ const styles = StyleSheet.create({
     },
     TodoBlock: {
         width: '30%',
-        height: 65,
+        height: '100%',
         marginLeft: 7,
         marginRight: 7,
         backgroundColor: '#EFF4FC',
@@ -806,7 +801,7 @@ const styles = StyleSheet.create({
     },
     modalInput: {
         width: '90%',
-        height: 40,
+        height: 48,
         marginTop: 40,
         marginBottom: 30,
         borderBottomWidth: 2,

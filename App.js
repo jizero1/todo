@@ -8,8 +8,8 @@ const App = () => {
 
     // 선택된 날짜 저장
     // const [selectedDate, setSelectedDate] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState(new Date(new Date().setDate(1))); // 월의 1일로 초기화
-    console.log("초기월"+selectedDate);
+    const [selectedDate, setSelectedDate] = useState(new Date()); // 월의 1일로 초기화
+    console.log("초기월" + selectedDate);
 
     const date = new Date();
     const year = date.getFullYear();
@@ -43,9 +43,17 @@ const App = () => {
     const changeMonth = useCallback((direction) => {
         const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
         newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
+
+
+        // 변경된 날짜가 현재 월의 마지막 날짜를 넘지 않도록 보정
+        if (newDate.getDate() !== selectedDate.getDate()) {
+            newDate.setDate(0); // 현재 월의 마지막 날짜로 설정
+        }
+        
         setSelectedDate(newDate); // 변경된 월을 selectedDate에 저장
-        console.log("selectedDate",selectedDate);
-        console.log("현재월"+newDate.getMonth());
+
+        console.log("selectedDate", selectedDate);
+        console.log("현재월" + newDate.getMonth());
     }, [selectedDate]);
 
     // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
@@ -149,7 +157,7 @@ const App = () => {
                                     <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }, click[day] ? { borderWidth: 3, borderColor: '#B6BCD2' } : { borderWidth: 3, borderColor: '#FFFFFF' }]}>
                                         <Text style={[styles.calendarDayText, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#898989' }]}>{dayText}</Text>
 
-                                        <Text style={[styles.calendarDateText, dayOfWeek === 0 ? {color:'red'} : {color:'black'}]}>{day}</Text>
+                                        <Text style={[styles.calendarDateText, dayOfWeek === 0 ? { color: 'red' } : { color: 'black' }]}>{day}</Text>
 
                                         <Text style={[styles.calendarDot, a[dayKey] ? { display: 'block' } : { display: 'none' }]}>.</Text>
                                     </View>
@@ -264,7 +272,7 @@ const App = () => {
                 </View>
                 {clickMood && (
                     <View style={styles.moodContainer}>
-                            <Text style={styles.moodText}>오늘의 기분을 선택 해보세요!</Text>
+                        <Text style={styles.moodText}>오늘의 기분을 선택 해보세요!</Text>
                         <TouchableOpacity style={styles.moodClose} onPress={moodClose}><Icon name="close" color="grey"></Icon></TouchableOpacity>
                         <View style={styles.moodImages}>
                             {moodImages.map((img, index) => (
@@ -671,10 +679,10 @@ const styles = StyleSheet.create({
         top: 10,
         right: 10,
     },
-    moodTextContainer : {
+    moodTextContainer: {
         width: '90%',
         height: 30,
-        justifyContent:'center',
+        justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
     },

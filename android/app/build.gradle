@@ -86,8 +86,8 @@ android {
         applicationId "com.jizerotodo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15
-        versionName "1.1.3"
+        versionCode 16
+        versionName "1.1.4"
         buildConfigField "boolean", "IS_HERMES_ENABLED", "false"
     }
 compileOptions {
@@ -144,8 +144,11 @@ dependencies {
     }
     apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
     implementation project(':react-native-vector-icons')
-
+// SplashScreen 의존성 추가
+    implementation 'androidx.core:core-splashscreen:1.0.1'
 }
+
+
 
 afterEvaluate {
     def fontCopyTask = tasks.findByName("copyReactNativeVectorIconFonts")

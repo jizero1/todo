@@ -545,7 +545,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-
     },
     calendarTodayDateBox: {
         width: 55,
@@ -562,8 +561,8 @@ const styles = StyleSheet.create({
         marginTop: 3,
     },
     calendarDate: {
-        width: 50,
-        height: 66,
+        width: 55,
+        height: '95%',
         borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',

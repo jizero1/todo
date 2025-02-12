@@ -7,10 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const App = () => {
 
     // 선택된 날짜 저장
-    // const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date()); // 월의 1일로 초기화
-    console.log("초기월" + selectedDate);
-
+    
     const date = new Date();
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -63,46 +61,42 @@ const App = () => {
         setSelectedDate(newDate); // 저장된 날짜를 selectedDate에 저장
     }, [selectedDate]);
 
-    // // 날짜마다 데이터가 있으면 . 표시유무 지정
+    // 날짜마다 데이터가 있으면 . 표시유무 지정
     const [a, setA] = useState({});
-
     useEffect(() => {
         const getData = async () => {
-            let updatedA = {};
+            const updatedA = {};
+
             try {
-                for (let i = firstDate; i <= lastDate; i++) {
-                    const allDays = `${nowYear}-${nowMonth}-${i}`;
-                    const get = await AsyncStorage.getItem(allDays);
-                    if (get !== null && get && get !== "[]") {
-                        updatedA[allDays] = true;
-                        console.log(allDays);
-                    } else {
-                        updatedA[allDays] = false;
-                    }
-                }
+                // 모든 날짜에 대해 비동기 작업을 병렬로 처리
+                await Promise.all(
+                    Array.from({ length: lastDate - firstDate + 1 }, (_, i) => {
+                        const day = i + firstDate;
+                        // const allDays = `${nowYear}-${nowMonth}-${String(day).padStart(2, '0')}`;
+                        const allDays = `${nowYear}-${nowMonth}-${i}`;
+                        
+                        return AsyncStorage.getItem(allDays).then(get => {
+                            if (get && get !== "[]") {
+                                updatedA[allDays] = true;
+                                console.log("데이터:", get, allDays);
+                            } else {
+                                updatedA[allDays] = false;
+                            }
+                        });
+                    })
+                );
+                
+                // 모든 데이터가 로드된 후 상태 업데이트
                 setA(updatedA);
                 console.log("데이터 불러오기 성공");
+
             } catch (error) {
-                console.log("데이터 불러오기 실패");
+                console.log("데이터 불러오기 실패", error);
             }
-        }
+        };
+
         getData();
     }, [nowYear, nowMonth, firstDate, lastDate, selectedDate]);
-
-
-    // 날짜 클릭 시, 해당 날짜의 점 표시 유무 반영
-    const handleDateDot = useCallback((day) => {
-        const newDate = new Date(selectedDate);
-        newDate.setDate(day);
-        setSelectedDate(newDate);
-
-        // 데이터가 있으면 점 표시
-        const dayKey = `${nowYear}-${nowMonth}-${day}`;
-        console.log("ddd" + dayKey);
-        if (a[dayKey] === true) {
-            console.log(`데이터가 들어있는 날짜 ${dayKey}`);
-        }
-    }, [selectedDate, a, nowYear, nowMonth]);
 
     // 클릭한 날짜 저장 (클릭한 날짜에 테두리 지정하기 위함)
     const [click, setClick] = useState({});
@@ -152,8 +146,17 @@ const App = () => {
 
 
                             const dayKey = `${nowYear}-${nowMonth}-${day}`;
+    //                         const get = AsyncStorage.getItem(dayKey);
+    //                         console.log("get"+get+dayKey);
+    // //                 if (get && get !== "[]") {
+    // //                     updatedA[allDays] = true;      
+    // //                     console.log("데이터"+get+allDays);
+    // //                 } else{
+    // //                     updatedA[allDays] = false;
+                    
+    // //                 }
                             return (
-                                <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); handleDateDot(day); moodClose(); }}>
+                                <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); moodClose(); }}>
                                     <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }, click[day] ? { borderWidth: 3, borderColor: '#B6BCD2' } : { borderWidth: 3, borderColor: '#FFFFFF' }]}>
                                         <Text style={[styles.calendarDayText, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { color: '#FFFFFF' } : { color: '#898989' }]}>{dayText}</Text>
 
@@ -171,7 +174,7 @@ const App = () => {
     }
 
     const [clickMood, setClickMood] = useState(false);
-    // const [closeMood, setCloseMood] = useState(false);
+
     const mood = () => {
         setClickMood(!clickMood);
     }
@@ -192,8 +195,6 @@ const App = () => {
     const saveMood = async (img) => {
 
         try {
-            // 선택된 날짜에 대해서만 저장
-            // const moodKey = `mood-${nowYear}-${nowMonth}-${selectedDate.getDate()}`;
             console.log(moodKey);
             await AsyncStorage.setItem(moodKey, JSON.stringify(img));
             console.log("기분저장성공", img);
@@ -207,10 +208,8 @@ const App = () => {
         const loadMood = async () => {
 
             try {
-                // const moodKey = `mood-${nowYear}-${nowMonth}-${selectedDate.getDate()}`;
                 const storedMood = await AsyncStorage.getItem(moodKey);
                 if (storedMood !== null) {
-                    // console.log(moodKey);
                     console.log("기분 불러오기 중", storedMood);
                     setSelectedMood(JSON.parse(storedMood));
                     console.log("기분 불러오기 성공", storedMood);
@@ -466,6 +465,7 @@ const App = () => {
             }
         };
         loadTodos();
+        
     }, [selectedDate]);
 
     // 저장소에 데이터 저장 ( todoList(텍스트관련 데이터)와 selectedDate(선택한 연도,달)의 값이 변경될때마다 실행)

@@ -6,8 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {
 
-    // 선택된 날짜 저장
-    const [selectedDate, setSelectedDate] = useState(new Date()); // 월의 1일로 초기화
+    // 사용자가 선택한 날짜를 저장할 변수
+    const [selectedDate, setSelectedDate] = useState(new Date());
     
     const date = new Date();
     const year = date.getFullYear();
@@ -27,7 +27,8 @@ const App = () => {
     const firstDate = firstDay.getDate(); // 1 이라는 날짜값만 반환
     const lastDate = lastDay.getDate(); // 마지막 날짜값만 반환
 
-    // 날짜 배열을 useMemo로 관리
+
+    // ---------------------- 날짜 배열 생성 --------------------- //
     const days = useMemo(() => {
         const daysArray = []; // 날짜를 저장할 빈 배열생성
         for (let i = firstDate; i <= lastDate; i++) {
@@ -37,13 +38,13 @@ const App = () => {
     }, [selectedDate]);
 
 
-    // 월 변경 함수 ( < > 누르면 direction값에 따라 월 변경 )
+     // ---------------------- 월 변경 함수 --------------------- //
     const changeMonth = useCallback((direction) => {
         const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
         newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
 
 
-        // 변경된 날짜가 현재 월의 마지막 날짜를 넘지 않도록 보정
+        // 변경된 날짜가 현재 월의 마지막 날짜를 넘지 않도록
         if (newDate.getDate() !== selectedDate.getDate()) {
             newDate.setDate(0); // 현재 월의 마지막 날짜로 설정
         }
@@ -54,14 +55,16 @@ const App = () => {
         console.log("현재월" + newDate.getMonth());
     }, [selectedDate]);
 
-    // 날짜 선택 함수 ( 클릭한 날짜를 selectedDate에 저장 )
+
+     // ---------------------- 클릭한 날짜 저장 함수 --------------------- //
     const handleDateClick = useCallback((day) => {
         const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성
         newDate.setDate(day); // 클릭한 날짜를 newDate객체에 저장
         setSelectedDate(newDate); // 저장된 날짜를 selectedDate에 저장
     }, [selectedDate]);
 
-    // 날짜마다 데이터가 있으면 . 표시유무 지정
+
+     // ---------------------- 데이터가 있으면 날짜에 . 표시 --------------------- //
     const [a, setA] = useState({});
     useEffect(() => {
         const getData = async () => {
@@ -70,9 +73,8 @@ const App = () => {
             try {
                 // 모든 날짜에 대해 비동기 작업을 병렬로 처리
                 await Promise.all(
+                    // 배열을 생성하고, 배열을 기반으로 반복문 실행
                     Array.from({ length: lastDate - firstDate + 1 }, (_, i) => {
-                        const day = i + firstDate;
-                        // const allDays = `${nowYear}-${nowMonth}-${String(day).padStart(2, '0')}`;
                         const allDays = `${nowYear}-${nowMonth}-${i}`;
                         
                         return AsyncStorage.getItem(allDays).then(get => {
@@ -94,11 +96,10 @@ const App = () => {
                 console.log("데이터 불러오기 실패", error);
             }
         };
-
         getData();
     }, [nowYear, nowMonth, firstDate, lastDate, selectedDate]);
 
-    // 클릭한 날짜 저장 (클릭한 날짜에 테두리 지정하기 위함)
+     // ---------------------- 현재 클릭한 날짜 저장 (테두리를 표시하기 위한 함수) --------------------- //
     const [click, setClick] = useState({});
     const dateClick = (day) => {
         setClick((prevState) => {
@@ -146,15 +147,7 @@ const App = () => {
 
 
                             const dayKey = `${nowYear}-${nowMonth}-${day}`;
-    //                         const get = AsyncStorage.getItem(dayKey);
-    //                         console.log("get"+get+dayKey);
-    // //                 if (get && get !== "[]") {
-    // //                     updatedA[allDays] = true;      
-    // //                     console.log("데이터"+get+allDays);
-    // //                 } else{
-    // //                     updatedA[allDays] = false;
-                    
-    // //                 }
+
                             return (
                                 <TouchableOpacity key={day} onPress={() => { handleDateClick(day); dateClick(day); moodClose(); }}>
                                     <View key={day} style={[styles.calendarDate, dateDay === day && year === selectedDate.getFullYear() && month === selectedDate.getMonth() ? { backgroundColor: '#C4D1F5' } : { backgroundColor: '#FFFFFF' }, click[day] ? { borderWidth: 3, borderColor: '#B6BCD2' } : { borderWidth: 3, borderColor: '#FFFFFF' }]}>
@@ -189,11 +182,12 @@ const App = () => {
         require('./img/icons/mood4.png'),
         require('./img/icons/mood5.png'),
     ]
+
+     // ---------------------- 기분 표시 함수 --------------------- //
     const [selectedMood, setSelectedMood] = useState(null); // 기본 이미지로 초기화
     const moodKey = `mood-${nowYear}-${nowMonth}-${selectedDate.getDate()}`;
 
     const saveMood = async (img) => {
-
         try {
             console.log(moodKey);
             await AsyncStorage.setItem(moodKey, JSON.stringify(img));

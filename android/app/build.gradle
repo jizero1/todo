@@ -2,7 +2,8 @@ apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-kapt'
-
+apply plugin: 'com.google.gms.google-services'
+// apply plugin: 'kotlin-android'
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -86,8 +87,8 @@ android {
         applicationId "com.jizerotodo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 16
-        versionName "1.1.4"
+        versionCode 18
+        versionName "1.1.6"
         buildConfigField "boolean", "IS_HERMES_ENABLED", "false"
     }
 compileOptions {
@@ -131,6 +132,7 @@ compileOptions {
     kotlinOptions {
         jvmTarget = '17'
     }
+
 }
 
 dependencies {
@@ -146,13 +148,25 @@ dependencies {
     implementation project(':react-native-vector-icons')
 // SplashScreen 의존성 추가
     implementation 'androidx.core:core-splashscreen:1.0.1'
+
+
+// implementation platform('com.google.firebase:firebase-bom:33.9.0')
+// implementation 'com.google.firebase:firebase-analytics'
+     implementation 'com.google.android.gms:play-services-ads:23.6.0'
+
+    // implementation 'com.google.firebase:firebase-analytics:21.0.0'
+
 }
 
-
-
+tasks.whenTaskAdded { task ->
+    if (task.name == 'lintAnalyzeDebug') {
+        task.enabled = false
+    }
+}
 afterEvaluate {
     def fontCopyTask = tasks.findByName("copyReactNativeVectorIconFonts")
     def lintReportTask = tasks.findByName("generateDebugLintReportModel")
 
     lintReportTask?.dependsOn(fontCopyTask)
 }
+

@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, Modal, ScrollView, TextInput, StyleSheet, TouchableWithoutFeedback, TouchableOpacity, Image } from 'react-native';
+import { View, Text, Modal, ScrollView, TextInput, StyleSheet, TouchableWithoutFeedback, TouchableOpacity, Image, Dimensions } from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { BannerAd, BannerAdSize, TestIds, MobileAds } from 'react-native-google-mobile-ads';
 
 const App = () => {
 
     // 사용자가 선택한 날짜를 저장할 변수
     const [selectedDate, setSelectedDate] = useState(new Date());
-    
+
     const date = new Date();
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -38,7 +40,7 @@ const App = () => {
     }, [selectedDate]);
 
 
-     // ---------------------- 월 변경 함수 --------------------- //
+    // ---------------------- 월 변경 함수 --------------------- //
     const changeMonth = useCallback((direction) => {
         const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성후, 현재 날짜값을 복붙
         newDate.setMonth(newDate.getMonth() + direction); // setMonth는 월을 설정하는 Date객체의 내장함수
@@ -48,7 +50,7 @@ const App = () => {
         if (newDate.getDate() !== selectedDate.getDate()) {
             newDate.setDate(0); // 현재 월의 마지막 날짜로 설정
         }
-        
+
         setSelectedDate(newDate); // 변경된 월을 selectedDate에 저장
 
         console.log("selectedDate", selectedDate);
@@ -56,7 +58,7 @@ const App = () => {
     }, [selectedDate]);
 
 
-     // ---------------------- 클릭한 날짜 저장 함수 --------------------- //
+    // ---------------------- 클릭한 날짜 저장 함수 --------------------- //
     const handleDateClick = useCallback((day) => {
         const newDate = new Date(selectedDate); // newDate라는 새로운 날짜객체 생성
         newDate.setDate(day); // 클릭한 날짜를 newDate객체에 저장
@@ -64,7 +66,7 @@ const App = () => {
     }, [selectedDate]);
 
 
-     // ---------------------- 데이터가 있으면 날짜에 . 표시 --------------------- //
+    // ---------------------- 데이터가 있으면 날짜에 . 표시 --------------------- //
     const [a, setA] = useState({});
     useEffect(() => {
         const getData = async () => {
@@ -76,7 +78,7 @@ const App = () => {
                     // 배열을 생성하고, 배열을 기반으로 반복문 실행
                     Array.from({ length: lastDate - firstDate + 1 }, (_, i) => {
                         const allDays = `${nowYear}-${nowMonth}-${i}`;
-                        
+
                         return AsyncStorage.getItem(allDays).then(get => {
                             if (get && get !== "[]") {
                                 updatedA[allDays] = true;
@@ -87,7 +89,7 @@ const App = () => {
                         });
                     })
                 );
-                
+
                 // 모든 데이터가 로드된 후 상태 업데이트
                 setA(updatedA);
                 console.log("데이터 불러오기 성공");
@@ -99,7 +101,7 @@ const App = () => {
         getData();
     }, [nowYear, nowMonth, firstDate, lastDate, selectedDate]);
 
-     // ---------------------- 현재 클릭한 날짜 저장 (테두리를 표시하기 위한 함수) --------------------- //
+    // ---------------------- 현재 클릭한 날짜 저장 (테두리를 표시하기 위한 함수) --------------------- //
     const [click, setClick] = useState({});
     const dateClick = (day) => {
         setClick((prevState) => {
@@ -183,7 +185,7 @@ const App = () => {
         require('./img/icons/mood5.png'),
     ]
 
-     // ---------------------- 기분 표시 함수 --------------------- //
+    // ---------------------- 기분 표시 함수 --------------------- //
     const [selectedMood, setSelectedMood] = useState(null); // 기본 이미지로 초기화
     const moodKey = `mood-${nowYear}-${nowMonth}-${selectedDate.getDate()}`;
 
@@ -379,6 +381,22 @@ const App = () => {
             { id: 5, color: '#DDB596' },
         ];
 
+        // -------------------------- 광고 배너 --------------------
+        const { width } = Dimensions.get('window'); // 화면 너비를 가져옵니다.
+        const adWidth = width;
+
+        useEffect(() => {
+            // MobileAds 초기화
+            MobileAds().initialize()
+                .then(() => {
+                    console.log('AdMob initialized');
+                })
+                .catch((err) => {
+                    console.error('AdMob initialization failed', err);
+                });
+        }, []);
+
+        
         return (
             <View style={styles.AddModalContainer}>
                 <TouchableOpacity style={styles.AddModalBtn} onPress={modalClick}>
@@ -391,6 +409,7 @@ const App = () => {
                     onRequestClose={modalClick} // 안드로이드에서 뒤로가기 버튼 누를때 모달 안보이게하기
                 >
                     <View style={styles.modalBackground} onTouchStart={modalBackgroundClick}>
+
                         <View style={styles.modalContainer}>
                             <View style={styles.modalRemove}>
                                 <TouchableWithoutFeedback onPress={modalClick}><Icon name="close" style={styles.modalRemoveIcon} ></Icon></TouchableWithoutFeedback>
@@ -415,6 +434,17 @@ const App = () => {
                             <View style={styles.modalSave}>
                                 <TouchableOpacity onPress={addTodo} style={styles.modalSaveCircle}><Icon name="add" style={styles.modalSaveText}></Icon></TouchableOpacity>
                             </View>
+
+
+                        </View>
+                        {/* --------------------- 광고 배너 추가 ----------------- */}
+                        <View style={{ marginTop: 20 }}>
+                            <BannerAd
+                                unitId={TestIds.BANNER} // 테스트용 배너 광고 ID (실제 ID로 변경 필요)
+                                size={BannerAdSize.BANNER}
+                                requestOptions={{}}
+                                style={{ width: adWidth, height: 30 }}
+                            />
                         </View>
                     </View>
                 </Modal>
@@ -459,7 +489,7 @@ const App = () => {
             }
         };
         loadTodos();
-        
+
     }, [selectedDate]);
 
     // 저장소에 데이터 저장 ( todoList(텍스트관련 데이터)와 selectedDate(선택한 연도,달)의 값이 변경될때마다 실행)
@@ -489,12 +519,18 @@ const App = () => {
         setTodoListCountCheck(todoList.filter(todo => todo.checked).length);
     }, [todoList]);
 
+
+
+
+
     return (
         <View style={styles.mainContainer}>
+
             <Calendar todoList={todoList}></Calendar>
             <TimeText></TimeText>
             <ToDoText todoList={todoList} toggleCheck={toggleCheck} removeTodo={removeTodo}></ToDoText>
             <AddModal setTodoList={setTodoList}></AddModal>
+            {/* <BannerAdExample></BannerAdExample> */}
         </View>
     )
 }

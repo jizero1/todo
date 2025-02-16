@@ -15,6 +15,8 @@
     "react": "18.3.1",
     "react-native": "0.76.5",
     "react-native-checkbox": "^2.0.0",
+    "react-native-device-info": "^14.0.4",
+    "react-native-google-mobile-ads": "^14.9.0",
     "react-native-vector-icons": "^10.2.0"
   },
   "devDependencies": {

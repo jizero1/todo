@@ -16,8 +16,10 @@ buildscript {
         classpath("com.facebook.react:react-native-gradle-plugin")
         // classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.24')
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-    }
 
+        classpath('com.google.gms:google-services:4.4.2')
+         classpath ('com.google.firebase:firebase-crashlytics-gradle:2.9.2')
+    }
 
 
 }
@@ -30,6 +32,3 @@ allprojects {
 }
 
 apply plugin: "com.facebook.react.rootproject"
-//apply plugin: "com.android.application"
-// apply plugin: 'kotlin-android'
-// apply plugin: 'kotlin-android-extensions'

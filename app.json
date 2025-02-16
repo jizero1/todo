@@ -1,4 +1,7 @@
 {
   "name": "todo",
-  "displayName": "하루토마토"
+  "displayName": "하루토마토",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-7451710423452825~5387344037"
+  }
 }

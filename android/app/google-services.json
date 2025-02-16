@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "53382281474",
+    "project_id": "harutomato-41595",
+    "storage_bucket": "harutomato-41595.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53382281474:android:b0f758bbebd77cd0c1ea1b",
+        "android_client_info": {
+          "package_name": "com.jizerotodo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOV-pF3tKyexAbRMFKy1kpoWcmmsRHR4E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

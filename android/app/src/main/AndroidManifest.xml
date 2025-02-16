@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.jizerotodo">
 
+<uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -27,7 +29,7 @@
 
           <meta-data
         android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="ca-app-pub-7451710423452825~5387344037" />
+        android:value="ca-app-pub-7451710423452825~5337047619" />
         
     </application>  
     
